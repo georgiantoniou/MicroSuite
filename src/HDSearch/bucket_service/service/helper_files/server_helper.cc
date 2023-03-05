@@ -1,4 +1,7 @@
 #include "server_helper.h"
+#include <grpc/grpc.h>
+#include <grpcpp/server.h>
+#include <grpcpp/server_builder.h>
 
 using grpc::Server;
 using grpc::ServerBuilder;
