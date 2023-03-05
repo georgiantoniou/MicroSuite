@@ -401,7 +401,7 @@ class DistanceServiceClient {
                     map_fine_mutex[unique_request_id]->unlock();
                 } else {
                     uint64_t bucket_resp_start_time = response_count_down_map[unique_request_id].index_reply->get_bucket_responses_time();
-                    //response_count_down_map[unique_request_id].index_reply->set_get_bucket_responses_time(GetTimeInMicro() - bucket_resp_start_time);
+                    response_count_down_map[unique_request_id].index_reply->set_get_bucket_responses_time(GetTimeInMicro() - bucket_resp_start_time);
                     /* Time to merge all responses received and then 
                        call terminate so that the response can be sent back
                        to the load generator.*/
