@@ -379,7 +379,9 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
         uint64_t* unpack_bucket_resp_time,
         uint64_t* unpack_bucket_req_time,
         uint64_t* calculate_knn_time,
-        uint64_t* pack_bucket_resp_time);
+        uint64_t* pack_bucket_resp_time,
+        uint64_t* bucket_proc_time,
+        uint64_t* bucket_idle_time);
 
 /* Print a Matrix of points - represents a collection of 
    points with 'd' dimensions.
