@@ -156,6 +156,10 @@ void UnpackTimingInfo(const NearestNeighborResponse &reply,
     bucket_timing_info->calculate_knn_time = reply.timing_data_in_micro().calculate_knn_time_in_micro();
     bucket_timing_info->pack_bucket_resp_time = reply.timing_data_in_micro().pack_bucket_resp_time_in_micro();
     bucket_timing_info->cpu_util_bucket = reply.timing_data_in_micro().cpu_util();
+    //ganton12
+    bucket_timing_info->bucket_start_time = reply.timing_data_in_micro().bucket_start_time();
+    bucket_timing_info->bucket_end_time = reply.timing_data_in_micro().bucket_end_time();
+
 }
 
 void UnpackUtilInfo(const NearestNeighborResponse &reply,
@@ -221,4 +225,3 @@ void CreatePointsFromFile(const std::string &file_name,
 {
     multiple_points->CreateMultiplePoints(file_name);
 }
-
