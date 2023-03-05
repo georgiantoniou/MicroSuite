@@ -1,6 +1,3 @@
-/* Author: Akshitha Sriraman
-   Ph.D. Candidate at the University of Michigan - Ann Arbor*/
-
 #include <fstream>
 #include <iterator>
 #include <sstream>
@@ -426,7 +423,7 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
         loadgen_index::ResponseIndexKnnQueries* index_reply)
 {
     DistCalc knn_answer;
-    uint64_t create_bucket_req_time = 0, unpack_bucket_resp_time = 0, unpack_bucket_req_time = 0, calculate_knn_time = 0, pack_bucket_resp_time = 0;
+    uint64_t create_bucket_req_time = 0, unpack_bucket_resp_time = 0, unpack_bucket_req_time = 0, calculate_knn_time = 0, pack_bucket_resp_time = 0, bucket_proc_time = 0, bucket_idle_time = 0;
     struct timeval tv;
     gettimeofday(&tv, NULL);
     uint64_t start_time = tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
@@ -442,7 +439,7 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
             &unpack_bucket_resp_time,
             &unpack_bucket_req_time,
             &calculate_knn_time,
-            &pack_bucket_resp_time);
+            &pack_bucket_resp_time, &bucket_proc_time, &bucket_idle_time);
     gettimeofday(&tv, NULL);
     uint64_t end_time = tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
     index_reply->set_merge_time((end_time-start_time));
@@ -462,6 +459,8 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
     index_reply->set_calculate_knn_time(calculate_knn_time);
     index_reply->set_pack_bucket_resp_time(pack_bucket_resp_time);
     index_reply->set_number_of_bucket_servers(number_of_bucket_servers);
+    index_reply->set_bucket_proc_time(bucket_proc_time);
+    index_reply->set_bucket_idle_time(bucket_idle_time);
 }
 
 void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
@@ -476,7 +475,9 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
         uint64_t* unpack_bucket_resp_time,
         uint64_t* unpack_bucket_req_time,
         uint64_t* calculate_knn_time,
-        uint64_t* pack_bucket_resp_time)
+        uint64_t* pack_bucket_resp_time,
+        uint64_t* bucket_proc_time,
+        uint64_t* bucket_idle_time)
 {
     std::vector<std::vector<uint32_t>> knn_all_queries;
     std::vector<uint32_t> knn;
@@ -515,6 +516,60 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
     (*unpack_bucket_req_time) = (*unpack_bucket_req_time)/number_of_bucket_servers;
     (*calculate_knn_time) = (*calculate_knn_time)/number_of_bucket_servers;
     (*pack_bucket_resp_time) = (*pack_bucket_resp_time)/number_of_bucket_servers;
+
+    std::vector<std::vector<uint64_t>> start;
+    std::vector<std::vector<uint64_t>> end;
+    for(unsigned int i = 0; i < number_of_bucket_servers; i++)
+    {
+        start.emplace_back(response_data[i].bucket_timing_info->bucket_start_time);
+        end.emplace_back(response_data[i].bucket_timing_info->bucket_end_time);
+    }
+
+    //ganton12
+    uint64_t i = 0, j = 0, active_counter = 0, proc_time = 0, idle_time = 0, cur_start = 0;
+    while j < end.size()
+    {
+        if i < start.size()
+        {
+            if cur_start == 0
+            {
+                cur_start = start[i];
+                active_counter++;
+                i++;
+            }
+            if end[j] < start[i]
+            {
+                active_counter--;
+                if active_counter == 0
+                {
+                    proc_time = proc_time + (end[j]-cur_start)
+                    cur_start = start[i]
+                    idle_time = idle_time + (cur_start - end[j])
+                    if i < start.size()
+                    {
+                        i++;
+                        active_counter++;
+                    }
+                }
+                j++;
+            }
+            else
+            {
+                if i < start.size()
+                    {
+                        i++;
+                        active_counter++;
+                    }
+            }
+        }
+        else
+        {
+            proc_time = proc_time + (end[end.size()-1] - cur_start);
+            j = end.size();
+        }
+    }
+    (*bucket_proc_time) = &proc_time;
+    (*bucket_idle_time) = &idle_time;
 }
 
 void PrintMatrix(const flann::Matrix<unsigned char> &matrix,
@@ -542,7 +597,6 @@ void PrintMatrix(const flann::Matrix<unsigned char> &matrix,
   }
   std::cout << std::endl;
   }
-
   }*/
 
 void InitializeTMs(const int num_tms,
@@ -818,4 +872,3 @@ void InitializeFMAsyncTMs(const int num_tms,
 
     }
 }
-
