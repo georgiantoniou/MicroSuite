@@ -27,6 +27,9 @@ struct TimingInfo
     uint64_t pack_index_resp_time = 0;
     uint64_t total_resp_time = 0;
     uint64_t index_time = 0;
+    //ganton12
+    uint64_t bucket_proc_time = 0;
+    uint64_t bucket_idle_time = 0;
 };
 
 /* This structure holds the data entered by the load generator user.*/
@@ -41,6 +44,7 @@ struct LoadGenCommandLineArgs
     std::string qps_file_name = "";
     std::string timing_file_name = "";
     std::string util_file_name = "";
+    
 };
 
 struct Util
