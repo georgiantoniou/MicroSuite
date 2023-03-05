@@ -527,25 +527,25 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
 
     //ganton12
     uint64_t i = 0, j = 0, active_counter = 0, proc_time = 0, idle_time = 0, cur_start = 0;
-    while j < end.size()
+    while (j < end.size())
     {
-        if i < start.size()
+        if (i < start.size())
         {
-            if cur_start == 0
+            if (cur_start == 0)
             {
                 cur_start = start[i];
                 active_counter++;
                 i++;
             }
-            if end[j] < start[i]
+            if (end[j] < start[i])
             {
                 active_counter--;
-                if active_counter == 0
+                if (active_counter == 0)
                 {
                     proc_time = proc_time + (end[j]-cur_start)
                     cur_start = start[i]
                     idle_time = idle_time + (cur_start - end[j])
-                    if i < start.size()
+                    if (i < start.size())
                     {
                         i++;
                         active_counter++;
@@ -555,7 +555,7 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
             }
             else
             {
-                if i < start.size()
+                if (i < start.size())
                     {
                         i++;
                         active_counter++;
