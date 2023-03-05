@@ -517,8 +517,8 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
     (*calculate_knn_time) = (*calculate_knn_time)/number_of_bucket_servers;
     (*pack_bucket_resp_time) = (*pack_bucket_resp_time)/number_of_bucket_servers;
 
-    std::vector<std::vector<uint64_t>> start;
-    std::vector<std::vector<uint64_t>> end;
+    std::vector<uint64_t> start;
+    std::vector<uint64_t> end;
     for(unsigned int i = 0; i < number_of_bucket_servers; i++)
     {
         start.emplace_back(response_data[i].bucket_timing_info->bucket_start_time);
