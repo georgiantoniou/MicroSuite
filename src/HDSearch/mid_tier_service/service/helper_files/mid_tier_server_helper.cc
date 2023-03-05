@@ -533,7 +533,7 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
         {
             if (cur_start == 0)
             {
-                cur_start = start[i];
+                cur_start = start.at(i);
                 active_counter++;
                 i++;
             }
