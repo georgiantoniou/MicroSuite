@@ -542,9 +542,9 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
                 active_counter--;
                 if (active_counter == 0)
                 {
-                    proc_time = proc_time + (end[j]-cur_start)
-                    cur_start = start[i]
-                    idle_time = idle_time + (cur_start - end[j])
+                    proc_time = proc_time + (end[j]-cur_start);
+                    cur_start = start[i];
+                    idle_time = idle_time + (cur_start - end[j]);
                     if (i < start.size())
                     {
                         i++;
@@ -568,8 +568,8 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
             j = end.size();
         }
     }
-    (*bucket_proc_time) = &proc_time;
-    (*bucket_idle_time) = &idle_time;
+    (*bucket_proc_time) = proc_time;
+    (*bucket_idle_time) = idle_time;
 }
 
 void PrintMatrix(const flann::Matrix<unsigned char> &matrix,
