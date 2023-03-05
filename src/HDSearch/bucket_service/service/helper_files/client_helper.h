@@ -11,6 +11,9 @@ struct BucketTimingInfo {
     uint64_t pack_bucket_resp_time = 0;
     uint64_t unpack_bucket_resp_time = 0;
     float cpu_util_bucket = 0.0;
+    //ganton12
+    uint64_t bucket_start_time = 0;
+    uint64_t bucket_end_time = 0;
 };
 
 struct BucketUtil {
