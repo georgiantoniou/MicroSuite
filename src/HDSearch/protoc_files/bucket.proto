@@ -40,6 +40,9 @@ message TimingDataInMicro{
     uint64 calculate_knn_time_in_micro = 2;
     uint64 pack_bucket_resp_time_in_micro = 3;
     float cpu_util = 4;
+    //TODO Ganton12
+    uint64 bucket_start_time = 5;
+    uint64 bucket_end_time = 6;
 }
 
 message UtilResponse {
@@ -61,4 +64,3 @@ message NearestNeighborResponse {
     uint64 index_view = 8;
     uint32 bucket_server_id = 9;
 }
-
