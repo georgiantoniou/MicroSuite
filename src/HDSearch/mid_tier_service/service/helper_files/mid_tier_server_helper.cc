@@ -466,8 +466,8 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
     
     for(unsigned int i = 0; i < number_of_bucket_servers; i++)
     {
-        index_reply.bucket_start_time.Add(start[i]);
-        index_reply.bucket_end_time.Add(end[i]);
+        index_reply->add_bucket_start_time(start[i]);
+        index_reply->add_bucket_end_time(end[i]);
     }
 }
 
@@ -527,8 +527,8 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
 
     for(unsigned int i = 0; i < number_of_bucket_servers; i++)
     {
-        start.emplace_back(response_data[i].bucket_timing_info->bucket_start_time);
-        end.emplace_back(response_data[i].bucket_timing_info->bucket_end_time);
+        (*start).emplace_back(response_data[i].bucket_timing_info->bucket_start_time);
+        (*end).emplace_back(response_data[i].bucket_timing_info->bucket_end_time);
     }
 
     //ganton12
