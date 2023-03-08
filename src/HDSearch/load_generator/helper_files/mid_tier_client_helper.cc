@@ -172,7 +172,7 @@ void UnpackTimingInfo(const loadgen_index::ResponseIndexKnnQueries &index_reply,
     timing_info->pack_bucket_resp_time = index_reply.pack_bucket_resp_time();
     timing_info->index_time = index_reply.index_time();
     //ganton12
-    for (int i = 0; i < index_reply->bucket_start_time_size(); i++)
+    for (int i = 0; i < index_reply.bucket_start_time_size(); i++)
     {
         timing_info->bucket_start_time.emplace_back(index_reply.bucket_start_time(i));
         timing_info->bucket_end_time.emplace_back(index_reply.bucket_end_time(i));
