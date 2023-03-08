@@ -80,6 +80,6 @@ message ResponseIndexKnnQueries {
     uint64 num_resp = 25; 
     bool kill_ack = 26;
     // TODO Ganton12 Temporary
-    uint64 bucket_proc_time = 27;
-    uint64 bucket_idle_time = 28;
+    repeated uint64 bucket_start_time = 27;
+    repeated uint64 bucket_end_time = 28;
 }
