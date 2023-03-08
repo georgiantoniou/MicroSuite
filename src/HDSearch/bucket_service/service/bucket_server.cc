@@ -66,7 +66,8 @@ void ProcessRequest(NearestNeighborRequest &request,
 
     // Unpack received queries and point IDs
     //ganton12
-    reply->mutable_timing_data_in_micro()->set_bucket_start_time(GetTimeInMicro());
+    uint64_t bucket_start = GetTimeInMicro()
+    reply->mutable_timing_data_in_micro()->set_bucket_start_time(bucket_start);
     Point p(dataset.GetPointAtIndex(0).GetSize(), 0.0);
     MultiplePoints queries(request.queries_size(), p);
     std::vector<std::vector<uint32_t>> point_ids_vec;
@@ -117,9 +118,10 @@ void ProcessRequest(NearestNeighborRequest &request,
     //GetCpuTimes(&idle_time_final, &total_time_final);
     
     //ganton12
-    reply->mutable_timing_data_in_micro()->set_bucket_end_time(GetTimeInMicro());
+    uint64_t bucket_end = GetTimeInMicro()
+    reply->mutable_timing_data_in_micro()->set_bucket_end_time(bucket_end);
    
-    std::count << reply->mutable_timing_data_in_micro()->get_bucket_start_time() << " " << reply->mutable_timing_data_in_micro()->get_bucket_end_time() << "\n";
+    std::count << bucket_start << " " << bucket_end << "\n";
     
     const float idle_time_delta = idle_time_final - idle_time_initial;
     const float total_time_delta = total_time_final - total_time_initial;
