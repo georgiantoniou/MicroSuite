@@ -463,8 +463,12 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
     index_reply->set_calculate_knn_time(calculate_knn_time);
     index_reply->set_pack_bucket_resp_time(pack_bucket_resp_time);
     index_reply->set_number_of_bucket_servers(number_of_bucket_servers);
-    index_reply->set_bucket_start_time(start);
-    index_reply->set_bucket_end_time(end);
+    
+    for(unsigned int i = 0; i < number_of_bucket_servers; i++)
+    {
+        index_reply.bucket_start_time.Add(start[i]);
+        index_reply.bucket_end_time.Add(end[i]);
+    }
 }
 
 void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
