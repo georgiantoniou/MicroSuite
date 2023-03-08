@@ -123,7 +123,7 @@ void ProcessRequest(NearestNeighborRequest &request,
    
     std::cout << bucket_start << " " << bucket_end << "\n";
    
-    cout.flush();
+    std::cout.flush();
     
     const float idle_time_delta = idle_time_final - idle_time_initial;
     const float total_time_delta = total_time_final - total_time_initial;
