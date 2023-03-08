@@ -172,8 +172,8 @@ void UnpackTimingInfo(const loadgen_index::ResponseIndexKnnQueries &index_reply,
     timing_info->pack_bucket_resp_time = index_reply.pack_bucket_resp_time();
     timing_info->index_time = index_reply.index_time();
     //ganton12
-    timing_info->bucket_proc_time = index_reply.bucket_proc_time();
-    timing_info->bucket_idle_time = index_reply.bucket_idle_time();
+    timing_info->bucket_start_time = index_reply.bucket_start_time();
+    timing_info->bucket_end_time = index_reply.bucket_end_time();
         
 }
 
