@@ -526,7 +526,7 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
     }
 
     //ganton12
-    uint64_t i = 0, j = 0, active_counter = 0, proc_time = 0, idle_time = 0, cur_start = 0;
+    /*uint64_t i = 0, j = 0, active_counter = 0, proc_time = 0, idle_time = 0, cur_start = 0;
     while (j < end.size())
     {
         if (i < start.size())
@@ -567,9 +567,12 @@ void MergeFromResponseMap(const std::vector<ResponseData> &response_data,
             proc_time = proc_time + (end[end.size()-1] - cur_start);
             j = end.size();
         }
-    }
-    (*bucket_proc_time) = proc_time;
-    (*bucket_idle_time) = idle_time;
+    } */
+    sort(start.begin(), start.end());
+    sort(end.begin(), end.end());
+    
+    (*bucket_proc_time) = end[end.size()-1] - start[0]; 
+    (*bucket_idle_time) = 0;
 }
 
 void PrintMatrix(const flann::Matrix<unsigned char> &matrix,
