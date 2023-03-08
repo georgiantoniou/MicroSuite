@@ -122,6 +122,8 @@ void ProcessRequest(NearestNeighborRequest &request,
     reply->mutable_timing_data_in_micro()->set_bucket_end_time(bucket_end);
    
     std::cout << bucket_start << " " << bucket_end << "\n";
+   
+    cout.flush();
     
     const float idle_time_delta = idle_time_final - idle_time_initial;
     const float total_time_delta = total_time_final - total_time_initial;
