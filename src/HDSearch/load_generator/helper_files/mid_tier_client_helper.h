@@ -28,8 +28,8 @@ struct TimingInfo
     uint64_t total_resp_time = 0;
     uint64_t index_time = 0;
     //ganton12
-    std::vector<uint64_t> bucket_start_time = 0;
-    std::vector<uint64_t> bucket_end_time = 0;
+    std::vector<uint64_t> bucket_start_time;
+    std::vector<uint64_t> bucket_end_time;
 };
 
 /* This structure holds the data entered by the load generator user.*/
