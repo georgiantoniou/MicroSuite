@@ -118,6 +118,8 @@ void ProcessRequest(NearestNeighborRequest &request,
     
     //ganton12
     reply->mutable_timing_data_in_micro()->set_bucket_end_time(GetTimeInMicro());
+   
+    std::count << reply->mutable_timing_data_in_micro()->get_bucket_start_time() << " " << reply->mutable_timing_data_in_micro()->get_bucket_end_time() << "\n";
     
     const float idle_time_delta = idle_time_final - idle_time_initial;
     const float total_time_delta = total_time_final - total_time_initial;
