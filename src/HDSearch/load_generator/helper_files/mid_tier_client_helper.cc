@@ -4,6 +4,13 @@
 #include <openssl/md5.h> // To cache seen images using md5 checksum
 #include <streambuf>
 #include <numeric>
+#include <iostream>
+#include <vector>
+
+struct Interval {
+    int start;
+    int end;
+};
 
 LoadGenCommandLineArgs* ParseLoadGenCommandLine(const int &argc,
         char** argv)
@@ -439,6 +446,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
 
     std::vector<uint64_t> total_response_time, create_index_req, update_index_util, unpack_loadgen_req, get_point_ids, get_bucket_responses, create_bucket_req, unpack_bucket_req, calculate_knn, pack_bucket_resp, unpack_bucket_resp, merge, pack_index_resp, unpack_index_resp, index_time, bucket_proc_time, bucket_idle_time;
     unsigned int timing_info_size = global_stats.timing_info.size();
+    std::vector<Interval> intervals(number_of_bucket_servers);
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
         total_response_time.push_back(global_stats.timing_info[i].total_resp_time);  
@@ -456,8 +464,29 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         pack_index_resp.push_back(global_stats.timing_info[i].pack_index_resp_time);
         unpack_index_resp.push_back(global_stats.timing_info[i].unpack_index_resp_time);
         index_time.push_back(global_stats.timing_info[i].index_time);
-        bucket_proc_time.push_back(global_stats.timing_info[i].bucket_proc_time);
-        bucket_idle_time.push_back(global_stats.timing_info[i].bucket_idle_time);
+        for (int i = 0; i < number_of_bucket_servers; i++) {
+                intervals[i].start = global_stats.timing_info[i].bucket_start_time[i];
+                intervals[i].end = global_stats.timing_info[i].bucket_end_time[i];
+        }
+            
+        sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
+        return a.start < b.start;
+        });
+            
+        int end_time = intervals[0].end;
+        for (int i = 1; i < num_intervals; i++) {
+                if (intervals[i].start >= end_time) {
+                        // no overlap, add idle time
+                        idle_time += intervals[i].start - end_time;
+                        end_time = intervals[i].end;
+                } else {
+                        // overlap, update end time
+                        end_time = max(end_time, intervals[i].end);
+                }
+        }
+        
+        bucket_proc_time.push_back(intervals[number_of_bucket_servers-1].end - intervals[0].start - idle_time);
+        bucket_idle_time.push_back(idle_time);
         
     }
     std::sort(total_response_time.begin(), total_response_time.end());
