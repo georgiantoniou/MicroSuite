@@ -472,16 +472,17 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
         return a.start < b.start;
         });
-            
+        
+        uint64_t idle_time = 0;
         int end_time = intervals[0].end;
-        for (int i = 1; i < num_intervals; i++) {
+        for (int i = 1; i < number_of_bucket_servers; i++) {
                 if (intervals[i].start >= end_time) {
                         // no overlap, add idle time
                         idle_time += intervals[i].start - end_time;
                         end_time = intervals[i].end;
                 } else {
                         // overlap, update end time
-                        end_time = max(end_time, intervals[i].end);
+                        end_time = std::max(end_time, intervals[i].end);
                 }
         }
         
