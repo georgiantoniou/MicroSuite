@@ -8,8 +8,8 @@
 #include <vector>
 
 struct Interval {
-    int start;
-    int end;
+    uint64_t start;
+    uint64_t end;
 };
 
 LoadGenCommandLineArgs* ParseLoadGenCommandLine(const int &argc,
