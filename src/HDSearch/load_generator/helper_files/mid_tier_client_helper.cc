@@ -468,9 +468,9 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         pack_index_resp.push_back(global_stats.timing_info[i].pack_index_resp_time);
         unpack_index_resp.push_back(global_stats.timing_info[i].unpack_index_resp_time);
         index_time.push_back(global_stats.timing_info[i].index_time);
-        for (int i = 0; i < number_of_bucket_servers; i++) {
-                intervals[i].start = global_stats.timing_info[i].bucket_start_time[i];
-                intervals[i].end = global_stats.timing_info[i].bucket_end_time[i];
+        for (int j = 0; j < number_of_bucket_servers; j++) {
+                intervals[j].start = global_stats.timing_info[i].bucket_start_time[j];
+                intervals[j].end = global_stats.timing_info[i].bucket_end_time[j];
         }
             
         sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
@@ -478,15 +478,15 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         });
         
         uint64_t idle_time = 0;
-        int end_time = intervals[0].end;
-        for (int i = 1; i < number_of_bucket_servers; i++) {
-                if (intervals[i].start >= end_time) {
+        uint64_t end_time = intervals[0].end;
+        for (int j = 1; j < number_of_bucket_servers; j++) {
+                if (intervals[j].start >= end_time) {
                         // no overlap, add idle time
-                        idle_time += intervals[i].start - end_time;
-                        end_time = intervals[i].end;
+                        idle_time += intervals[j].start - end_time;
+                        end_time = intervals[j].end;
                 } else {
                         // overlap, update end time
-                        end_time = std::max(end_time, intervals[i].end);
+                        end_time = std::max(end_time, intervals[j].end);
                 }
         }
         
