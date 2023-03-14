@@ -390,11 +390,7 @@ class DistanceServiceClient {
                 *(response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info) = bucket_timing_info;
                 *(response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_util) = bucket_util;
                 response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->unpack_bucket_resp_time = end_time - start_time;
-               if (response_count_down_map[unique_request_id].responses_recvd == 2) {
-                     for (int i = 0; i < 2; i++) {
-                        std::cout << response_count_down_map[unique_request_id].response_data[i].bucket_timing_info->bucket_start_time << " " << response_count_down_map[unique_request_id].response_data[i].bucket_timing_info->bucket_end_time << "\n";
-                    }
-                }
+               
 #if 0
                 if (response_count_down_map[unique_request_id].responses_recvd == 2) {
                     uint64_t bucket_resp_start_time = response_count_down_map[unique_request_id].index_reply->get_bucket_responses_time();
@@ -405,11 +401,15 @@ class DistanceServiceClient {
                     response_count_down_map[unique_request_id].responses_recvd++;
                     map_fine_mutex[unique_request_id]->unlock();
                     std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_start_time << " " << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_end_time << "\n";
+                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
                 } else {
                     std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_start_time << " " << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_end_time << "\n";
+                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
                     uint64_t bucket_resp_start_time = response_count_down_map[unique_request_id].index_reply->get_bucket_responses_time();
                     response_count_down_map[unique_request_id].index_reply->set_get_bucket_responses_time(GetTimeInMicro() - bucket_resp_start_time);
-                   
+                    for (int i = 0; i < 4; i++) {
+                         std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
+                    }
                      /* Time to merge all responses received and then 
                        call terminate so that the response can be sent back
                        to the load generator.*/
