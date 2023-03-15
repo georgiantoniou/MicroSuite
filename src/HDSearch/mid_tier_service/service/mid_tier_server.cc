@@ -400,11 +400,9 @@ class DistanceServiceClient {
                 if (response_count_down_map[unique_request_id].responses_recvd != (number_of_bucket_servers - 1)) {
                     response_count_down_map[unique_request_id].responses_recvd++;
                     map_fine_mutex[unique_request_id]->unlock();
-                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_start_time << " " << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_end_time << "\n";
-                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
+                    
                 } else {
-                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_start_time << " " << response_count_down_map[unique_request_id].response_data[bucket_resp_id].bucket_timing_info->bucket_end_time << "\n";
-                    std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
+                    
                     uint64_t bucket_resp_start_time = response_count_down_map[unique_request_id].index_reply->get_bucket_responses_time();
                     response_count_down_map[unique_request_id].index_reply->set_get_bucket_responses_time(GetTimeInMicro() - bucket_resp_start_time);
                    
