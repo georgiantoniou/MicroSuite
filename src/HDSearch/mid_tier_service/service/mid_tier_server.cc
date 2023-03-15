@@ -407,15 +407,7 @@ class DistanceServiceClient {
                     std::cout << response_count_down_map[unique_request_id].response_data[bucket_resp_id].knn_answer << "\n";
                     uint64_t bucket_resp_start_time = response_count_down_map[unique_request_id].index_reply->get_bucket_responses_time();
                     response_count_down_map[unique_request_id].index_reply->set_get_bucket_responses_time(GetTimeInMicro() - bucket_resp_start_time);
-                    for (int i = 0; i < 4; i++) {
-                       unsigned int neighbors_size = response_count_down_map[unique_request_id].response_data[i].knn_answer->GetValueAtIndex(i).size();
-                        for(unsigned int k = 0; k < neighbors_size; k++)
-                       {
-                            std::cout << response_count_down_map[unique_request_id].response_data[i].knn_answer->GetValueAtIndex(0).at(k) << "\n";
-             
-                        }
-                        
-                    }
+                   
                      /* Time to merge all responses received and then 
                        call terminate so that the response can be sent back
                        to the load generator.*/
