@@ -511,6 +511,9 @@ class DistanceServiceClient {
             }
             response_count_down_map[unique_request_id_value].responses_recvd = 0;
             response_count_down_map[unique_request_id_value].response_data.resize(number_of_bucket_servers, ResponseData());
+            for (int i = 0; i < number_of_bucket_servers; i++) {
+                        response_count_down_map[unique_request_id_value].response_data[i] = ResponseData();
+            }
             response_count_down_map[unique_request_id_value].index_reply->set_request_id(load_gen_request.request_id());
             response_count_down_map[unique_request_id_value].index_reply->set_num_inline(network_poller_parallelism);
             response_count_down_map[unique_request_id_value].index_reply->set_num_workers(dispatch_parallelism);
