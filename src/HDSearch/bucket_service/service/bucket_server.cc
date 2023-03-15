@@ -121,7 +121,6 @@ void ProcessRequest(NearestNeighborRequest &request,
     uint64_t bucket_end = GetTimeInMicro();
     reply->mutable_timing_data_in_micro()->set_bucket_end_time(bucket_end);
    
-    std::cout << bucket_start << " " << bucket_end << "\n";
    
     std::cout.flush();
     
