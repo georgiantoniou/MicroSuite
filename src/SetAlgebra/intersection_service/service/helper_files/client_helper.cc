@@ -38,6 +38,10 @@ void UnpackTimingInfo(const IntersectionResponse &reply,
     intersection_srv_timing_info->calculate_intersection_time = reply.timing_data_in_micro().calculate_intersection_time_in_micro();
     intersection_srv_timing_info->pack_intersection_srv_resp_time = reply.timing_data_in_micro().pack_intersection_srv_resp_time_in_micro();
     intersection_srv_timing_info->cpu_util_intersection_srv = reply.timing_data_in_micro().cpu_util();
+    //ganton12
+    intersection_timing_info->intersection_start_time = reply.timing_data_in_micro().intersection_start_time();
+    intersection_timing_info->intersection_end_time = reply.timing_data_in_micro().intersection_end_time();    
+    
 }
 
 void UnpackUtilInfo(const IntersectionResponse &reply,
