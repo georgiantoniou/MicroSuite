@@ -448,8 +448,10 @@ void PrintGlobalStats(const GlobalStats &global_stats,
 {
     /*std::cout << global_stats.timing_info.create_index_req_time/responses_recvd << "," << global_stats.timing_info.update_index_util_time/responses_recvd << "," << global_stats.timing_info.unpack_loadgen_req_time/responses_recvd << "," << global_stats.timing_info.get_point_ids_time/responses_recvd << "," << global_stats.timing_info.get_bucket_responses_time/responses_recvd << "," << global_stats.timing_info.create_bucket_req_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_req_time/responses_recvd << "," << global_stats.timing_info.calculate_knn_time/responses_recvd << "," << global_stats.timing_info.pack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.merge_time/responses_recvd << "," << global_stats.timing_info.pack_index_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_index_resp_time/responses_recvd << "," << global_stats.timing_info.total_resp_time/responses_recvd << "," << global_stats.percent_util_info.index_util_percent.user_util/util_requests << "," << global_stats.percent_util_info.index_util_percent.system_util/util_requests << "," << global_stats.percent_util_info.index_util_percent.io_util/util_requests << "," << global_stats.percent_util_info.index_util_percent.idle_util/util_requests << ",";*/
 
-    std::vector<uint64_t> total_response_time, create_index_req, update_index_util, unpack_loadgen_req, get_point_ids, get_bucket_responses, create_bucket_req, unpack_bucket_req, calculate_knn, pack_bucket_resp, unpack_bucket_resp, merge, pack_index_resp, unpack_index_resp, index_time, bucket_proc_time, bucket_idle_time;
+    std::vector<uint64_t> total_response_time, create_index_req, update_index_util, unpack_loadgen_req, get_point_ids, get_bucket_responses, create_bucket_req, unpack_bucket_req, calculate_knn, pack_bucket_resp, unpack_bucket_resp, merge, pack_index_resp, unpack_index_resp, index_time, bucket_proc_time, bucket_idle_time, bucket_all_time;
     unsigned int timing_info_size = global_stats.timing_info.size();
+    std::vector<uint64_t> temp_bucket_start;
+    std::vector<uint64_t> temp_bucket_end;
     std::vector<Interval> intervals(number_of_bucket_servers);
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
@@ -471,6 +473,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         for (int j = 0; j < number_of_bucket_servers; j++) {
                 intervals[j].start = global_stats.timing_info[i].bucket_start_time[j];
                 intervals[j].end = global_stats.timing_info[i].bucket_end_time[j];
+                temp_bucket_start.push_back(global_stats.timing_info[i].bucket_start_time[j]);
+                temp_bucket_end.push_back(global_stats.timing_info[i].bucket_end_time[j]);
         }
             
         sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
@@ -492,7 +496,9 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         
         bucket_proc_time.push_back(intervals[number_of_bucket_servers-1].end - intervals[0].start - idle_time);
         bucket_idle_time.push_back(idle_time);
-        
+        bucket_all_time.push_back((std::max_element(temp_bucket_end.begin(), temp_bucket_end.end())) - (std::min_element(temp_bucket_start.begin(), temp_bucket_start.end())));
+        temp_bucket_start.clear();
+        temp_bucket_end.clear();
     }
     std::sort(total_response_time.begin(), total_response_time.end());
     std::sort(create_index_req.begin(), create_index_req.end());
