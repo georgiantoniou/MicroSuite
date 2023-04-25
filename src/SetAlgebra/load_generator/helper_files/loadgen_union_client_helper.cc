@@ -230,7 +230,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
 {
     /*std::cout << global_stats.timing_info.create_union_req_time/responses_recvd << "," << global_stats.timing_info.update_union_util_time/responses_recvd << "," << global_stats.timing_info.unpack_loadgen_req_time/responses_recvd << "," << global_stats.timing_info.get_point_ids_time/responses_recvd << "," << global_stats.timing_info.get_bucket_responses_time/responses_recvd << "," << global_stats.timing_info.create_bucket_req_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_req_time/responses_recvd << "," << global_stats.timing_info.calculate_knn_time/responses_recvd << "," << global_stats.timing_info.pack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.merge_time/responses_recvd << "," << global_stats.timing_info.pack_union_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_union_resp_time/responses_recvd << "," << global_stats.timing_info.total_resp_time/responses_recvd << "," << global_stats.percent_util_info.union_util_percent.user_util/util_requests << "," << global_stats.percent_util_info.union_util_percent.system_util/util_requests << "," << global_stats.percent_util_info.union_util_percent.io_util/util_requests << "," << global_stats.percent_util_info.union_util_percent.idle_util/util_requests << ",";*/
 
-    std::vector<uint64_t> total_response_time, create_union_req, update_union_util, unpack_union_req, get_intersection_srv_responses, create_intersection_srv_req, unpack_intersection_srv_req, calculate_intersection_time, pack_intersection_srv_resp, unpack_intersection_srv_resp, merge, pack_union_resp, unpack_union_resp, union_time,intersection_proc_time, intersection_idle_time, intersection_all_time;
+    std::vector<uint64_t> total_response_time, create_union_req, update_union_util, unpack_union_req, get_intersection_srv_responses, create_intersection_srv_req, unpack_intersection_srv_req, calculate_intersection_time, pack_intersection_srv_resp, unpack_intersection_srv_resp, merge, pack_union_resp, unpack_union_resp, union_time,intersection_proc_time, intersection_idle_time;
+    std::vector<double> intersection_all_time;
     unsigned int timing_info_size = global_stats.timing_info.size();
     std::vector<uint64_t> temp_intersection_start;
     std::vector<uint64_t> temp_intersection_end;
@@ -276,7 +277,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         
         intersection_proc_time.push_back(intervals[number_of_intersection_servers-1].end - intervals[0].start - idle_time);
         intersection_idle_time.push_back(idle_time);
-        intersection_all_time.push_back((std::max_element(temp_intersection_end.begin(), temp_intersection_end.end())) - (std::min_element(temp_intersection_start.begin(), temp_intersection_start.end())));
+        intersection_all_time.push_back((std::max_element(temp_intersection_end.begin(), temp_intersection_end.end()))/(double)1000 - (std::min_element(temp_intersection_start.begin(), temp_intersection_start.end()))/(double)1000);
         temp_intersection_start.clear();
         temp_intersection_end.clear();
             
@@ -351,7 +352,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     PrintTime(intersection_idle_time); 
     
     uint64_t intersection_all_time_size = intersection_all_time.size();
-    std::cout << "\nIntersection All Time(ms): " << (double)std::accumulate(intersection_all_time.begin(), intersection_all_time.end(), 0)/(double)intersection_all_time_size/(double)1000 << " \n"; 
+    std::cout << "\nIntersection All Time(ms): " << (double)std::accumulate(intersection_all_time.begin(), intersection_all_time.end(), 0)/(double)intersection_all_time_size << " \n"; 
     PrintTime(intersection_all_time); 
     /*for(int i = 0; i < number_of_bucket_servers; i++)
       {
