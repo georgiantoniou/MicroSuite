@@ -95,6 +95,9 @@ void ProcessRequest(IntersectionRequest &request,
             word_to_docids,
             &doc_ids_for_all_words);
     if (!res) {
+        //ganton12
+        uint64_t intersection_end = GetTimeInMicro();
+        reply->mutable_timing_data_in_micro()->set_intersection_end_time(intersection_end);
         return;
     }
     Docids num_words_in_query = word_ids.size();
