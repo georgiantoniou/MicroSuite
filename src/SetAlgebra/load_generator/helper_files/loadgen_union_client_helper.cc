@@ -320,8 +320,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     PrintTime(create_intersection_srv_req);
     std::cout << "\n Unpack bucket request time ";
     PrintTime(unpack_intersection_srv_req);
-     uint64_t unpack_intersection_size = unpack_intersection_srv_req.size();
-    std::cout << "Average Intersection Unpack Time(ms): " << (double)std::accumulate(unpack_intersection_srv_req.begin(), unpack_intersection_srv_req.end(), 0)/(double)unpack_intersection_size/(double)1000 << " \n";    
+     uint64_t unpack_intersection_request_size = unpack_intersection_srv_req.size();
+    std::cout << "Average Intersection Request Unpack Time(ms): " << (double)std::accumulate(unpack_intersection_srv_req.begin(), unpack_intersection_srv_req.end(), 0)/(double)unpack_intersection_request_size/(double)1000 << " \n";    
         
     std::cout << "\n Calculate knn time \n";
     PrintTime(calculate_intersection_time);
