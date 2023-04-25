@@ -12,6 +12,9 @@ struct IntersectionSrvTimingInfo {
     uint64_t pack_intersection_srv_resp_time = 0;
     uint64_t unpack_intersection_srv_resp_time = 0;
     float cpu_util_intersection_srv = 0.0;
+    //ganton12
+    uint64_t intersection_start_time = 0;
+    uint64_t intersection_end_time = 0;
 };
 
 struct IntersectionSrvUtil {
