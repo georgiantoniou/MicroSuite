@@ -88,8 +88,8 @@ void UnpackTimingInfo(const union_service::UnionResponse &union_reply,
     //ganton12
     for (int i = 0; i < union_reply.intersection_start_time_size(); i++)
     {
-        timing_info->intersection_start_time.emplace_back(union_reply.intersection_start_time(i));
-        timing_info->intersection_end_time.emplace_back(union_reply.intersection_end_time(i));
+        timing_info->intersection_start_time[i].emplace_back(union_reply.intersection_start_time(i));
+        timing_info->intersection_end_time[i].emplace_back(union_reply.intersection_end_time(i));
         
     }
 }
