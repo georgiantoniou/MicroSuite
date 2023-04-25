@@ -302,6 +302,10 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::sort(pack_union_resp.begin(), pack_union_resp.end());
     std::sort(unpack_union_resp.begin(), unpack_union_resp.end());
     std::sort(union_time.begin(), union_time.end());
+    std::sort(intersection_proc_time.begin(), intersection_proc_time.end());
+    std::sort(intersection_idle_time.begin(), intersection_idle_time.end());
+     std::sort(intersection_all_time.begin(), intersection_all_time.end());
+    
     std::cout << "\n Total response time \n"; 
     PrintTime(total_response_time);
     std::cout << std::endl;
