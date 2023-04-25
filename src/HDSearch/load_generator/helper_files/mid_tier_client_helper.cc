@@ -421,6 +421,12 @@ void PrintTime(std::vector<uint64_t> time_vec)
     std::cout << (double)time_vec[0.1*size]/1000.0 << " " << (double)time_vec[0.2*size]/1000.0 << " " << (double)time_vec[0.3*size]/1000.0 << " " << (double)time_vec[0.4*size]/1000.0 << " " << (double)time_vec[0.5*size]/1000.0 << " " << (double)time_vec[0.6*size]/1000.0 << " " << (double)time_vec[0.7*size]/1000.0 << " " << (double)time_vec[0.8*size]/1000.0 << " " << (double)time_vec[0.9*size]/1000.0 << " " << (double)(double)time_vec[0.95*size]/1000.0 << " " << (double)(double)time_vec[0.99*size]/1000.0 << " " << (double)(double)time_vec[0.999*size]/1000.0 << " ";
 }
 
+void PrintTime(std::vector<double> time_vec)
+{
+    uint64_t size = time_vec.size();
+    std::cout << (double)time_vec[0.1*size] << " " << (double)time_vec[0.2*size] << " " << (double)time_vec[0.3*size] << " " << (double)time_vec[0.4*size] << " " << (double)time_vec[0.5*size] << " " << (double)time_vec[0.6*size] << " " << (double)time_vec[0.7*size] << " " << (double)time_vec[0.8*size] << " " << (double)time_vec[0.9*size] << " " << (double)(double)time_vec[0.95*size] << " " << (double)(double)time_vec[0.99*size] << " " << (double)(double)time_vec[0.999*size] << " ";
+}
+
 float ComputeQueryCost(const GlobalStats &global_stats,
         const unsigned int util_requests,
         const unsigned int number_of_bucket_servers,
@@ -497,7 +503,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         
         bucket_proc_time.push_back(intervals[number_of_bucket_servers-1].end - intervals[0].start - idle_time);
         bucket_idle_time.push_back(idle_time);
-        bucket_all_time.push_back((std::max_element(temp_bucket_end.begin(), temp_bucket_end.end()))/(double)1000 - (std::min_element(temp_bucket_start.begin(), temp_bucket_start.end()))/(double)1000);
+        bucket_all_time.push_back((double)*(std::max_element(temp_bucket_end.begin(), temp_bucket_end.end()))/(double)1000 - (double)*(std::min_element(temp_bucket_start.begin(), temp_bucket_start.end()))/(double)1000);
         temp_bucket_start.clear();
         temp_bucket_end.clear();
     }
