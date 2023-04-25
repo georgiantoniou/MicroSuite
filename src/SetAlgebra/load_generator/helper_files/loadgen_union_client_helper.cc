@@ -251,7 +251,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         pack_union_resp.push_back(global_stats.timing_info[i].pack_union_resp_time);
         unpack_union_resp.push_back(global_stats.timing_info[i].unpack_union_resp_time);
         union_time.push_back(global_stats.timing_info[i].union_time);
-        or (int j = 0; j < number_of_intersection_servers; j++) {
+        for (int j = 0; j < number_of_intersection_servers; j++) {
                 intervals[j].start = global_stats.timing_info[i].intersection_start_time[j];
                 intervals[j].end = global_stats.timing_info[i].intersection_end_time[j];
                 temp_intersection_start.push_back(global_stats.timing_info[i].intersection_start_time[j]);
