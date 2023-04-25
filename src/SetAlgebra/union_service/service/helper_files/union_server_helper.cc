@@ -86,8 +86,8 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
         intersection_srv_util->set_idle_time(response_data[j].intersection_srv_util->idle_time);
             
         //ganton12
-        union_reply->add_intersection_start_time(response_data[i].intersection_srv_timing_info->intersection_start_time);
-        union_reply->add_intersection_end_time(response_data[i].intersection_srv_timing_info->intersection_end_time);
+        union_reply->add_intersection_start_time(response_data[j].intersection_srv_timing_info->intersection_start_time);
+        union_reply->add_intersection_end_time(response_data[j].intersection_srv_timing_info->intersection_end_time);
                                  
         for(unsigned int k = 0; k < response_data[j].posting_list->size(); k++)
         {
