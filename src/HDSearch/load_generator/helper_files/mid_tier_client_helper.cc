@@ -524,6 +524,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::sort(index_time.begin(), index_time.end());
     std::sort(bucket_proc_time.begin(), bucket_proc_time.end());
     std::sort(bucket_idle_time.begin(), bucket_idle_time.end());
+    std::sort(bucket_all_time.begin(), bucket_all_time.end());
+    
     PrintTime(total_response_time);
     std::cout << "\n Total response time \n"; 
     PrintTime(total_response_time);
