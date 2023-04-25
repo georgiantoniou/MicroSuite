@@ -25,6 +25,9 @@ message TimingDataInMicro {
     uint64 calculate_intersection_time_in_micro = 2;
     uint64 pack_intersection_srv_resp_time_in_micro = 3;
     float cpu_util = 4;
+    //TODO Ganton12
+    uint64 intersection_start_time = 5;
+    uint64 intersection_end_time = 6;
 }
 
 message UtilResponse {
