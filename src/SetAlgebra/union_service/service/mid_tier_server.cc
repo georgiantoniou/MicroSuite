@@ -464,8 +464,8 @@ class IntersectionServiceClient {
                 CHECK(false, "Exit signal received\n");
             }
             response_count_down_map[unique_request_id_value].responses_recvd = 0;
-            //comment this out as it does not create new object for each response, it reuses the same one
-            //response_count_down_map[unique_request_id_value].response_data.resize(number_of_intersection_servers, ResponseData());
+            //ganton12
+            response_count_down_map[unique_request_id_value].response_data.resize(number_of_intersection_servers, ResponseData());
             for (int i = 0; i < number_of_intersection_servers; i++) {
                         response_count_down_map[unique_request_id_value].response_data[i] = ResponseData();
             }
