@@ -62,4 +62,7 @@ message UnionResponse {
     uint64 num_workers = 21;
     uint64 num_resp = 22; 
     bool kill_ack = 23;
+     // TODO Ganton12 Temporary
+    repeated uint64 intersection_start_time = 27;
+    repeated uint64 intersection_end_time = 28;
 }
