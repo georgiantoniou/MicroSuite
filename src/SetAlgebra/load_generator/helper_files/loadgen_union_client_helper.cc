@@ -334,8 +334,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     
     std::cout << "\n Unpack bucket response time ";
     PrintTime(unpack_intersection_srv_resp);
-    uint64_t pack_intersection_size = pack_intersection_srv_resp.size();
-    std::cout << "Average Unpack Intersection Time(ms): " << (double)std::accumulate(pack_intersection_srv_resp.begin(), pack_intersection_srv_resp.end(), 0)/(double)pack_intersection_size/(double)1000 << " \n";    
+    uint64_t unpack_intersection_size = unpack_intersection_srv_resp.size();
+    std::cout << "Average Unpack Intersection Time(ms): " << (double)std::accumulate(unpack_intersection_srv_resp.begin(), unpack_intersection_srv_resp.end(), 0)/(double)unpack_intersection_size/(double)1000 << " \n";    
     
     
     std::cout << "\n Pack union response time ";
