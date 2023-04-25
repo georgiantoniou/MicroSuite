@@ -562,7 +562,10 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     uint64_t bucket_idle_time_size = bucket_idle_time.size();
     std::cout << "\nBucket Idle Time(ms): " << (double)std::accumulate(bucket_idle_time.begin(), bucket_idle_time.end(), 0)/(double)bucket_idle_time_size/(double)1000 << " \n"; 
     PrintTime(bucket_idle_time); 
-        
+    
+    uint64_t bucket_all_time_size = bucket_all_time.size();
+    std::cout << "\nBucket All Time(ms): " << (double)std::accumulate(bucket_all_time.begin(), bucket_all_time.end(), 0)/(double)bucket_all_time_size/(double)1000 << " \n"; 
+    PrintTime(bucket_all_time); 
         /*for(int i = 0; i < number_of_bucket_servers; i++)
       {
       std::cout << global_stats.percent_util_info.bucket_util_percent[i].user_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].system_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].io_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].idle_util/util_requests << ",";
