@@ -84,12 +84,15 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
         intersection_srv_util->set_system_time(response_data[j].intersection_srv_util->system_time);
         intersection_srv_util->set_io_time(response_data[j].intersection_srv_util->io_time);
         intersection_srv_util->set_idle_time(response_data[j].intersection_srv_util->idle_time);
-
+        union_reply->add_intersection_start_time(response_data[i].intersection_srv_timing_info->intersection_start_time);
+        union_reply->add_intersection_end_time(response_data[i].intersection_srv_timing_info->intersection_end_time);
+                                 
         for(unsigned int k = 0; k < response_data[j].posting_list->size(); k++)
         {
             union_reply->add_doc_ids(response_data[j].posting_list->at(k));
         }
     }
+    
     create_intersection_srv_req_time = create_intersection_srv_req_time/number_of_intersection_servers;
     unpack_intersection_srv_resp_time = unpack_intersection_srv_resp_time/number_of_intersection_servers;
     unpack_intersection_srv_req_time = unpack_intersection_srv_req_time/number_of_intersection_servers;
