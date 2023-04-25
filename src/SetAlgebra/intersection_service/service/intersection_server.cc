@@ -61,7 +61,9 @@ void ProcessRequest(IntersectionRequest &request,
 #ifndef NODEBUG
     std::cout << "after util\n";
 #endif
-
+     //ganton12
+     uint64_t intersection_start = GetTimeInMicro();
+     reply->mutable_timing_data_in_micro()->set_intersection_start_time(intersection_start);
     /* Simply copy request id into the reply - this was just a 
        piggyback message.*/
     reply->set_request_id(request.request_id());
@@ -75,7 +77,7 @@ void ProcessRequest(IntersectionRequest &request,
     // Unpack received queries and point IDs
     start_time = GetTimeInMicro();
     std::vector<Docids> word_ids;
-
+    
     UnpackIntersectionServiceRequest(request,
             &word_ids);
 
@@ -129,7 +131,11 @@ void ProcessRequest(IntersectionRequest &request,
     PackIntersectionServiceResponse(intersection_res,
             reply);
     reply->mutable_timing_data_in_micro()->set_pack_intersection_srv_resp_time_in_micro((GetTimeInMicro() - start_time));
-
+   
+    //ganton12
+    uint64_t intersection_end = GetTimeInMicro();
+    reply->mutable_timing_data_in_micro()->set_intersection_end_time(intersection_end);
+   
     // Convert K-NN into form suitable for GRPC.
     const float idle_time_delta = idle_time_final - idle_time_initial;
     const float total_time_delta = total_time_final - total_time_initial;
