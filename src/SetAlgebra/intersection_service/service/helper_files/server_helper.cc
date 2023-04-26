@@ -66,7 +66,7 @@ bool ExtractDocids(const std::vector<Docids> &word_ids,
         try {
             word_to_docids.at(word_ids[i]);
         } catch(...) {
-            return false;
+            //return false;
             //CHECK(false, "Word not present in wikipedia\n");
             /* Return result for other words if this
                word if this word does not exist in wikipedia.*/
