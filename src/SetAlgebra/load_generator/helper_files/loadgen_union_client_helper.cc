@@ -385,6 +385,8 @@ void PrintLatency(const GlobalStats &global_stats,
     std::sort(total_response_time.begin(), total_response_time.end());
     //uint64_t size = total_response_time.size();
     //std::cout << (float)total_response_time[0.5*size]/1000.0 << " " << (float)total_response_time[0.99*size]/1000.0 << " ";
+    uint64_t total_response_time_size = total_response_time.size();
+    std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), 0)/(double)total_response_time_size/(double)1000 << " \n";
     PrintTime(total_response_time);
 }
 
