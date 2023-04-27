@@ -541,12 +541,12 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::cout << "\n Total time taken by index server: \n";
     PrintTime(index_time);
     uint64_t index_size = index_time.size();
-    std::cout << "Average Index Time(ms): " << (double)std::accumulate(index_time.begin(), index_time.end(), 0)/(double)index_size/(double)1000 << " \n"; 
+    std::cout << "Average Index Time(ms): " << (double)std::accumulate(index_time.begin(), index_time.end(), (unsigned long long) 0)/(double)index_size/(double)1000 << " \n"; 
     //std::cout << std::endl;
     std::cout << "\n Get bucket responses time \n";
     PrintTime(get_bucket_responses);
     uint64_t bucket_size = get_bucket_responses.size();
-    std::cout << "Average Bucket Time(ms): " << (double)std::accumulate(get_bucket_responses.begin(), get_bucket_responses.end(), 0)/(double)bucket_size/(double)1000 << " \n"; 
+    std::cout << "Average Bucket Time(ms): " << (double)std::accumulate(get_bucket_responses.begin(), get_bucket_responses.end(), (unsigned long long) 0)/(double)bucket_size/(double)1000 << " \n"; 
     std::cout << "\n Create bucket request time ";
     PrintTime(create_bucket_req);
     std::cout << "\n Unpack bucket request time ";
@@ -565,15 +565,15 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     PrintTime(unpack_index_resp);
     
     uint64_t bucket_proc_time_size = bucket_proc_time.size();
-    std::cout << "\nBucket Proc Time(ms): " << (double)std::accumulate(bucket_proc_time.begin(), bucket_proc_time.end(), 0)/(double)bucket_proc_time_size/(double)1000 << " \n"; 
+    std::cout << "\nBucket Proc Time(ms): " << (double)std::accumulate(bucket_proc_time.begin(), bucket_proc_time.end(), (unsigned long long) 0)/(double)bucket_proc_time_size/(double)1000 << " \n"; 
     PrintTime(bucket_proc_time); 
     
     uint64_t bucket_idle_time_size = bucket_idle_time.size();
-    std::cout << "\nBucket Idle Time(ms): " << (double)std::accumulate(bucket_idle_time.begin(), bucket_idle_time.end(), 0)/(double)bucket_idle_time_size/(double)1000 << " \n"; 
+    std::cout << "\nBucket Idle Time(ms): " << (double)std::accumulate(bucket_idle_time.begin(), bucket_idle_time.end(), (unsigned long long) 0)/(double)bucket_idle_time_size/(double)1000 << " \n"; 
     PrintTime(bucket_idle_time); 
     
     uint64_t bucket_all_time_size = bucket_all_time.size();
-    std::cout << "\nBucket All Time(ms): " << (double)std::accumulate(bucket_all_time.begin(), bucket_all_time.end(), 0)/(double)bucket_all_time_size << " \n"; 
+    std::cout << "\nBucket All Time(ms): " << (double)std::accumulate(bucket_all_time.begin(), bucket_all_time.end(), (double) 0.0)/(double)bucket_all_time_size << " \n"; 
     PrintTime(bucket_all_time); 
         /*for(int i = 0; i < number_of_bucket_servers; i++)
       {
@@ -595,7 +595,7 @@ void PrintLatency(const GlobalStats &global_stats,
     }
     std::sort(total_response_time.begin(), total_response_time.end());
     uint64_t size = total_response_time.size();
-    std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), 0)/(double)size/(double)1000 << " \n"; 
+    std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), (unsigned long long) 0)/(double)size/(double)1000 << " \n"; 
     PrintTime(total_response_time);
 }
 
