@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <streambuf>
 #include <sstream>
+#include <numeric>
 #include "protoc_files/recommender.grpc.pb.h"
 
 #define CHECK(condition, error_message) if (!condition) {std::cerr << __FILE__ << ": " << __LINE__ << ": " << error_message << "\n"; exit(-1);}
