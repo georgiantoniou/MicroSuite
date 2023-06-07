@@ -468,7 +468,13 @@ class CFServiceClient {
 #endif
             }
             response_count_down_map[unique_request_id_value].responses_recvd = 0;
+            //response_count_down_map[unique_request_id_value].response_data.resize(number_of_cf_servers, ResponseData());
+            
+            //ganton12
             response_count_down_map[unique_request_id_value].response_data.resize(number_of_cf_servers, ResponseData());
+            for (int i = 0; i < number_of_cf_servers; i++) {
+                        response_count_down_map[unique_request_id_value].response_data[i] = ResponseData();
+            }
             response_count_down_map[unique_request_id_value].recommender_reply->set_request_id(recommender_request.request_id());
             response_count_down_map[unique_request_id_value].recommender_reply->set_num_inline(recommender_parallelism);
             response_count_down_map[unique_request_id_value].recommender_reply->set_num_workers(dispatch_parallelism);
