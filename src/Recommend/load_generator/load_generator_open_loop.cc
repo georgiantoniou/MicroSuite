@@ -184,6 +184,9 @@ class RecommenderServiceClient {
                     char* cmd = new char[s.length() + 1];
                     std::strcpy(cmd, s.c_str());
                     ExecuteShellCommand(cmd);
+                    std::cout << "Call Status Error Code: " << call->status.error_code() << "\n";
+                    std::cout << "Call Status Error Message: " << call->status.error_message() << "\n";
+                    std::cout << "Call Status Error Details: " << call->status.error_details() << "\n";
                     std::cout << "Load generator failed\n";
                     CHECK(false, "");
                 }
@@ -250,17 +253,22 @@ class RecommenderServiceClient {
             uint64_t query_id = rand() % queries_size;
             std::pair<int, int> query = queries[query_id];
 
-            double center = 1000000.0/(double)(qps);
+             double center = 1000000.0/(double)(qps);
             double curr_time = (double)GetTimeInMicro();
-            double exit_time = curr_time + (double)(time_duration*1000000.0);
+            double exit_time = curr_time + (double)(15*1000000.0);
+            uint64_t overall_queries = 1000 * 15;
 
             std::default_random_engine generator;
             std::poisson_distribution<int> distribution(center);
             double next_time = distribution(generator) + curr_time;
 
-            while (curr_time < exit_time) 
+          
+          //!!!!!!!WarmUp Phase!!!!!!
+          
+          
+            while (responses_recvd->AtomicallyReadCount() < overall_queries) 
             {
-                if (curr_time >= next_time) {
+                if (curr_time >= next_time && num_requests->AtomicallyReadCount() < overall_queries) {
                     num_requests->AtomicallyIncrementCount();
                     if((num_requests->AtomicallyReadCount() == 1) || ((GetTimeInSec() - interval_start_time) >= 10)){
                         util_requests->AtomicallyIncrementCount();
@@ -279,21 +287,72 @@ class RecommenderServiceClient {
                 }
                 curr_time = (double)GetTimeInMicro();
             }
-
+          
+            // Reset Timing Statistics
+            global_stats_mutex.lock();
+            ResetMetaStats(global_stats,number_of_cf_servers);
+            global_stats_mutex.unlock();
+           
+            //Reset requests counters
+            num_requests->AtomicallyResetCount();
+            responses_recvd->AtomicallyResetCount();
+           
+            //Print counters to validate
             float achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
+            std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
+            std::cout << "!!!!!!!End of Warmup Period!!!!!!!" << " \n";
+          
+            double curr_time = (double)GetTimeInMicro();
+            double exit_time = curr_time + (double)(time_duration*1000000.0);
+            overall_queries = qps * time_duration;
+            next_time = distribution(generator) + curr_time;
+            query_id = rand() % queries_size;
+            query = queries[query_id];
+         
+            while (responses_recvd->AtomicallyReadCount() < overall_queries) 
+            {
+                if (curr_time >= next_time && num_requests->AtomicallyReadCount() < overall_queries) {
+                    num_requests->AtomicallyIncrementCount();
+                    if((num_requests->AtomicallyReadCount() == 1) || ((GetTimeInSec() - interval_start_time) >= 10)){
+                        util_requests->AtomicallyIncrementCount();
+                        recommender_client.Recommender(query,
+                                true,
+                                false);
+                        interval_start_time = GetTimeInSec();
+                    } else {
+                        recommender_client.Recommender(query,
+                                false,
+                                false);  
+                    }
+                    next_time = distribution(generator) + curr_time;
+                    query_id = rand() % queries_size;
+                    query = queries[query_id];
+                }
+                curr_time = (double)GetTimeInMicro();
+            }
+          
+            float achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
+            std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
 
             global_stats_mutex.lock();
             PrintLatency(*global_stats,
                     number_of_cf_servers,
                     (util_requests->AtomicallyReadCount() - 1),
                     responses_recvd->AtomicallyReadCount());
-
+            
             float query_cost = ComputeQueryCost(*global_stats, 
                     (util_requests->AtomicallyReadCount() - 1),
                     number_of_cf_servers, 
                     achieved_qps);
+            PrintGlobalStats(*global_stats,
+                    number_of_cf_servers,
+                    (util_requests->AtomicallyReadCount()-1),
+                    responses_recvd->AtomicallyReadCount());
+            std::cout.flush();
             global_stats_mutex.unlock();
-
+           
             std::cout << query_cost << " ";
             std::cout << std::endl;
 
