@@ -66,4 +66,7 @@ message RecommenderResponse {
     string value = 23;
     uint64 merge_time = 24; 
     uint64 total_calc_time = 26;
+    // TODO Ganton12 Temporary
+    repeated uint64 cfserver_start_time = 27;
+    repeated uint64 cfserver_end_time = 28;
 }
