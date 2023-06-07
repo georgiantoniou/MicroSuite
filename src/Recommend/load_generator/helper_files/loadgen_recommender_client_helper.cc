@@ -1,5 +1,8 @@
 #include "loadgen_recommender_client_helper.h"
-
+struct Interval {
+    uint64_t start;
+    uint64_t end;
+};
 LoadGenCommandLineArgs* ParseLoadGenCommandLine(const int &argc,
         char** argv)
 {
@@ -227,8 +230,13 @@ void PrintGlobalStats(const GlobalStats &global_stats,
 {
     /*std::cout << global_stats.timing_info.create_recommender_req_time/responses_recvd << "," << global_stats.timing_info.update_recommender_util_time/responses_recvd << "," << global_stats.timing_info.unpack_loadgen_req_time/responses_recvd << "," << global_stats.timing_info.get_point_ids_time/responses_recvd << "," << global_stats.timing_info.get_bucket_responses_time/responses_recvd << "," << global_stats.timing_info.create_bucket_req_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_req_time/responses_recvd << "," << global_stats.timing_info.calculate_knn_time/responses_recvd << "," << global_stats.timing_info.pack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.merge_time/responses_recvd << "," << global_stats.timing_info.pack_recommender_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_recommender_resp_time/responses_recvd << "," << global_stats.timing_info.total_resp_time/responses_recvd << "," << global_stats.percent_util_info.recommender_util_percent.user_util/util_requests << "," << global_stats.percent_util_info.recommender_util_percent.system_util/util_requests << "," << global_stats.percent_util_info.recommender_util_percent.io_util/util_requests << "," << global_stats.percent_util_info.recommender_util_percent.idle_util/util_requests << ",";*/
 
-    std::vector<uint64_t> total_response_time, create_recommender_req, update_recommender_util, unpack_recommender_req, get_cf_srv_responses, create_cf_srv_req, unpack_cf_srv_req, calculate_cf_time, pack_cf_srv_resp, unpack_cf_srv_resp, merge, pack_recommender_resp, unpack_recommender_resp, recommender_time;
+    std::vector<uint64_t> total_response_time, create_recommender_req, update_recommender_util, unpack_recommender_req, get_cf_srv_responses, create_cf_srv_req, unpack_cf_srv_req, calculate_cf_time, pack_cf_srv_resp, unpack_cf_srv_resp, merge, pack_recommender_resp, unpack_recommender_resp, recommender_time, cfserver_proc_time, cfserver_idle_time;;
+    std::vector<double> cfserver_all_time;
     unsigned int timing_info_size = global_stats.timing_info.size();
+    std::vector<uint64_t> temp_cfserver_start;
+    std::vector<uint64_t> temp_cfserver_end;
+    std::vector<Interval> intervals(number_of_cf_servers);
+       
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
         total_response_time.push_back(global_stats.timing_info[i].total_resp_time);
@@ -244,6 +252,36 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         pack_recommender_resp.push_back(global_stats.timing_info[i].pack_recommender_resp_time);
         unpack_recommender_resp.push_back(global_stats.timing_info[i].unpack_recommender_resp_time);
         recommender_time.push_back(global_stats.timing_info[i].recommender_time);
+            
+        for (int j = 0; j < number_of_cf_servers; j++) {
+                intervals[j].start = global_stats.timing_info[i].cfserver_start_time[j];
+                intervals[j].end = global_stats.timing_info[i].cfserver_end_time[j];
+                temp_cfserver_start.push_back(global_stats.timing_info[i].cfserver_start_time[j]);
+                temp_cfserver_end.push_back(global_stats.timing_info[i].cfserver_end_time[j]);
+        }
+            
+        sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
+        return a.start < b.start;
+        });
+        
+        uint64_t idle_time = 0;
+        uint64_t end_time = intervals[0].end;
+        for (int j = 1; j < number_of_cf_servers; j++) {
+                if (intervals[j].start >= end_time) {
+                        // no overlap, add idle time
+                        idle_time += intervals[j].start - end_time;
+                        end_time = intervals[j].end;
+                } else {
+                        // overlap, update end time
+                        end_time = std::max(end_time, intervals[j].end);
+                }
+        }
+        
+        cfserver_proc_time.push_back(intervals[number_of_intersection_servers-1].end - intervals[0].start - idle_time);
+        cfserver_idle_time.push_back(idle_time);
+        cfserver_all_time.push_back((double)*(std::max_element(temp_cfserver_end.begin(), temp_cfserver_end.end()))/(double)1000 - (double)*(std::min_element(temp_cfserver_start.begin(), temp_cfserver_start.end()))/(double)1000);
+        temp_cfserver_start.clear();
+        temp_cfserver_end.clear();
     }
     std::sort(total_response_time.begin(), total_response_time.end());
     std::sort(create_recommender_req.begin(), create_recommender_req.end());
@@ -258,6 +296,11 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::sort(pack_recommender_resp.begin(), pack_recommender_resp.end());
     std::sort(unpack_recommender_resp.begin(), unpack_recommender_resp.end());
     std::sort(recommender_time.begin(), recommender_time.end());
+    std::sort(cfserver_proc_time.begin(), cfserver_proc_time.end());
+    std::sort(cfserver_idle_time.begin(), cfserver_idle_time.end());
+    std::sort(cfserver_all_time.begin(), cfserver_all_time.end());    
+        
+        
     std::cout << "\n Total response time \n"; 
     PrintTime(total_response_time);
     std::cout << std::endl;
@@ -267,25 +310,66 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     PrintTime(update_recommender_util);
     std::cout << "\n Unpack loadgen request time ";
     PrintTime(unpack_recommender_req);
+  
     std::cout << "\n Total time taken by recommender server: \n";
     PrintTime(recommender_time);
+    uint64_t recommender_size = recommender_time.size();
+    std::cout << "Average Recommender Time(ms): " << (double)std::accumulate(recommender_time.begin(), recommender_time.end(), (unsigned long long) 0)/(double)recommender_size/(double)1000 << " \n";
+  
     //std::cout << std::endl;
     std::cout << "\n Get bucket responses time \n";
     PrintTime(get_cf_srv_responses);
+    uint64_t get_cf_srv_responses_size = get_cf_srv_responses.size();
+    std::cout << "Average Bucket Response Time(ms): " << (double)std::accumulate(get_cf_srv_responses.begin(), get_cf_srv_responses.end(), (unsigned long long) 0)/(double)get_cf_srv_responses_size/(double)1000 << " \n";
+    
+    
     std::cout << "\n Create bucket request time ";
     PrintTime(create_cf_srv_req);
+    uint64_t create_cf_srv_req_size = create_cf_srv_req.size();
+    std::cout << "Average Create Bucket Request Time(ms): " << (double)std::accumulate(create_cf_srv_req.begin(), create_cf_srv_req.end(), (unsigned long long) 0)/(double)create_cf_srv_req_size/(double)1000 << " \n";
+    
     std::cout << "\n Unpack bucket request time ";
     PrintTime(unpack_cf_srv_req);
+    uint64_t unpack_cf_srv_req_size = unpack_cf_srv_req.size();
+    std::cout << "Average Unpack Bucket Request Time(ms): " << (double)std::accumulate(unpack_cf_srv_req.begin(), unpack_cf_srv_req.end(), (unsigned long long) 0)/(double)unpack_cf_srv_req_size/(double)1000 << " \n";
+    
     std::cout << "\n Calculate knn time \n";
     PrintTime(calculate_cf_time);
+    uint64_t calculate_cf_time_size = calculate_cf_time.size();
+    std::cout << "Average Calculate knn Time(ms): " << (double)std::accumulate(calculate_cf_time.begin(), calculate_cf_time.end(), (unsigned long long) 0)/(double)calculate_cf_time_size/(double)1000 << " \n";
+    
     std::cout << "\n Pack bucket response time ";
     PrintTime(pack_cf_srv_resp);
+    uint64_t pack_cf_srv_resp_size = pack_cf_srv_resp.size();
+    std::cout << "Average Pack Bucket Response Time(ms): " << (double)std::accumulate(pack_cf_srv_resp.begin(), pack_cf_srv_resp.end(), (unsigned long long) 0)/(double)pack_cf_srv_resp_size/(double)1000 << " \n";
+    
     std::cout << "\n Unpack bucket response time ";
     PrintTime(unpack_cf_srv_resp);
+    uint64_t unpack_cf_srv_resp_size = unpack_cf_srv_resp.size();
+    std::cout << "Average Unpack Bucket Response Time(ms): " << (double)std::accumulate(unpack_cf_srv_resp.begin(), unpack_cf_srv_resp.end(), (unsigned long long) 0)/(double)unpack_cf_srv_resp_size/(double)1000 << " \n";
+  
     std::cout << "\n Pack recommender response time ";
     PrintTime(pack_recommender_resp);
+    uint64_t pack_recommender_resp_size = pack_recommender_resp.size();
+    std::cout << "Average Pack Recommender Response Time(ms): " << (double)std::accumulate(pack_recommender_resp.begin(), pack_recommender_resp.end(), (unsigned long long) 0)/(double)pack_recommender_resp_size/(double)1000 << " \n";
+  
     std::cout << "\n Unpack recommender response time ";
     PrintTime(unpack_recommender_resp);
+    uint64_t unpack_recommender_resp_size = unpack_recommender_resp.size();
+    std::cout << "Average Unpack Recommender Response Time(ms): " << (double)std::accumulate(unpack_recommender_resp.begin(), unpack_recommender_resp.end(), (unsigned long long) 0)/(double)unpack_recommender_resp_size/(double)1000 << " \n";
+    
+    uint64_t cfserver_proc_time_size = cfserver_proc_time.size();
+    std::cout << "\nCf Server Proc Time(ms): " << (double)std::accumulate(cfserver_proc_time.begin(), cfserver_proc_time.end(), (unsigned long long) 0)/(double)cfserver_proc_time_size/(double)1000 << " \n"; 
+    PrintTime(cfserver_proc_time); 
+    
+    uint64_t cfserver_idle_time_size = cfserver_idle_time.size();
+    std::cout << "\nCf Server Idle Time(ms): " << (double)std::accumulate(cfserver_idle_time.begin(), cfserver_idle_time.end(), (unsigned long long) 0)/(double)cfserver_idle_time_size/(double)1000 << " \n"; 
+    PrintTime(cfserver_idle_time); 
+    
+    uint64_t cfserver_all_time_size = cfserver_all_time.size();
+    std::cout << "\nCf Server All Time(ms): " << (double)std::accumulate(cfserver_all_time.begin(), cfserver_all_time.end(), (double)  0.0)/(double)cfserver_all_time_size << " \n"; 
+    PrintTime(cfserver_all_time);
+  
     /*for(int i = 0; i < number_of_bucket_servers; i++)
       {
       std::cout << global_stats.percent_util_info.bucket_util_percent[i].user_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].system_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].io_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].idle_util/util_requests << ",";
@@ -307,6 +391,8 @@ void PrintLatency(const GlobalStats &global_stats,
     std::sort(total_response_time.begin(), total_response_time.end());
     //uint64_t size = total_response_time.size();
     //std::cout << (float)total_response_time[0.5*size]/1000.0 << " " << (float)total_response_time[0.99*size]/1000.0 << " ";
+    uint64_t total_response_time_size = total_response_time.size();
+    std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), (unsigned long long) 0)/(double)total_response_time_size/(double)1000 << " \n";
     PrintTime(total_response_time);
 }
 
