@@ -10,6 +10,9 @@ struct CFSrvTimingInfo {
     uint64_t pack_cf_srv_resp_time = 0;
     uint64_t unpack_cf_srv_resp_time = 0;
     float cpu_util_cf_srv = 0.0;
+    //ganton12
+    uint64_t cfserver_start_time = 0;
+    uint64_t cfserver_end_time = 0;
 };
 
 struct CFSrvUtil {
