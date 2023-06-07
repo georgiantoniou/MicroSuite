@@ -303,8 +303,8 @@ class RecommenderServiceClient {
             std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
             std::cout << "!!!!!!!End of Warmup Period!!!!!!!" << " \n";
           
-            double curr_time = (double)GetTimeInMicro();
-            double exit_time = curr_time + (double)(time_duration*1000000.0);
+            curr_time = (double)GetTimeInMicro();
+            exit_time = curr_time + (double)(time_duration*1000000.0);
             overall_queries = qps * time_duration;
             next_time = distribution(generator) + curr_time;
             query_id = rand() % queries_size;
@@ -332,7 +332,7 @@ class RecommenderServiceClient {
                 curr_time = (double)GetTimeInMicro();
             }
           
-            float achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
             std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
             std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
 
