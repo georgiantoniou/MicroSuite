@@ -27,6 +27,9 @@ message TimingDataInMicro{
     uint64 pack_cf_srv_resp_time_in_micro = 3;
     uint64 bucket_time = 5;
     float cpu_util = 4;
+    //TODO Ganton12
+    uint64 cfserver_start_time = 5;
+    uint64 cfserver_end_time = 6;
 }
 
 message UtilResponse {
