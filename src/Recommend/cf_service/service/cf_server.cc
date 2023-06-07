@@ -59,6 +59,10 @@ void ProcessRequest(CFRequest &request,
         reply->mutable_util_response()->set_util_present(true);
     }
 
+     //ganton12
+     uint64_t cfserver_start = GetTimeInMicro();
+     reply->mutable_timing_data_in_micro()->set_cfserver_start_time(cfserver_start);
+   
     /* Simply copy request id into the reply - this was just a 
        piggyback message.*/
     reply->set_request_id(request.request_id());
@@ -97,6 +101,9 @@ void ProcessRequest(CFRequest &request,
             &rating);
     end_time = GetTimeInMicro();
     reply->mutable_timing_data_in_micro()->set_calculate_cf_srv_time_in_micro((end_time - start_time));
+   //ganton12
+    uint64_t cfserver_end = GetTimeInMicro();
+    reply->mutable_timing_data_in_micro()->set_cfserver_end_time(cfserver_end);
 
     // Convert K-NN into form suitable for GRPC.
     start_time = GetTimeInMicro();
