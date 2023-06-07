@@ -85,6 +85,14 @@ void UnpackTimingInfo(const recommender::RecommenderResponse &recommender_reply,
     timing_info->calculate_cf_time = recommender_reply.calculate_cf_srv_time();
     timing_info->pack_cf_srv_resp_time = recommender_reply.pack_cf_srv_resp_time();
     timing_info->recommender_time = recommender_reply.recommender_time();
+    
+    //ganton12
+    for (int i = 0; i < recommender_reply.cfserver_start_time_size(); i++)
+    {
+        timing_info->cfserver_start_time.emplace_back(recommender_reply.cfserver_start_time(i));
+        timing_info->cfserver_end_time.emplace_back(recommender_reply.cfserver_end_time(i));
+        
+    }
 }
 
 void UnpackUtilInfo(const recommender::RecommenderResponse &recommender_reply,
