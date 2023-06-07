@@ -35,6 +35,9 @@ void UnpackTimingInfo(const CFResponse &reply,
     cf_srv_timing_info->cf_srv_time = reply.timing_data_in_micro().calculate_cf_srv_time_in_micro();
     cf_srv_timing_info->pack_cf_srv_resp_time = reply.timing_data_in_micro().pack_cf_srv_resp_time_in_micro();
     cf_srv_timing_info->cpu_util_cf_srv = reply.timing_data_in_micro().cpu_util();
+     //ganton12
+    cf_srv_timing_info->cfserver_start_time = reply.timing_data_in_micro().cfserver_start_time();
+    cf_srv_timing_info->cfserver_end_time = reply.timing_data_in_micro().cfserver_end_time();
 }
 
 void UnpackUtilInfo(const CFResponse &reply,
