@@ -86,6 +86,10 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
         unpack_cf_srv_req_time += response_data[i].cf_srv_timing_info->unpack_cf_srv_req_time;
         cf_srv_time += response_data[i].cf_srv_timing_info->cf_srv_time;
         pack_cf_srv_resp_time += response_data[i].cf_srv_timing_info->pack_cf_srv_resp_time;
+            
+         //ganton12
+        recommender_reply->add_cfserver_start_time(response_data[i].cf_srv_timing_info->cfserver_start_time);
+        recommender_reply->add_cfserver_end_time(response_data[i].cf_srv_timing_info->cfserver_end_time);
     }
     final_rating = final_rating / number_of_cf_servers;
     recommender_reply->set_rating(final_rating);
