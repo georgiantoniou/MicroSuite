@@ -101,15 +101,18 @@ void ProcessRequest(CFRequest &request,
             &rating);
     end_time = GetTimeInMicro();
     reply->mutable_timing_data_in_micro()->set_calculate_cf_srv_time_in_micro((end_time - start_time));
-   //ganton12
-    uint64_t cfserver_end = GetTimeInMicro();
-    reply->mutable_timing_data_in_micro()->set_cfserver_end_time(cfserver_end);
+   
 
     // Convert K-NN into form suitable for GRPC.
     start_time = GetTimeInMicro();
     PackCFServiceResponse(rating, 
             reply);
     end_time = GetTimeInMicro();
+   
+    //ganton12
+    uint64_t cfserver_end = GetTimeInMicro();
+    reply->mutable_timing_data_in_micro()->set_cfserver_end_time(cfserver_end);
+   
     reply->mutable_timing_data_in_micro()->set_pack_cf_srv_resp_time_in_micro((end_time - start_time));
     //GetCpuTimes(&idle_time_final, &total_time_final);
     const float idle_time_delta = idle_time_final - idle_time_initial;
