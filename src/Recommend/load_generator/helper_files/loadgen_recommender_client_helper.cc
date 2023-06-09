@@ -283,7 +283,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
                 }
         }
         
-        cfserver_proc_time.push_back(intervals[number_of_intersection_servers-1].end - intervals[0].start - idle_time);
+        cfserver_proc_time.push_back(intervals[number_of_cf_servers-1].end - intervals[0].start - idle_time);
         cfserver_idle_time.push_back(idle_time);
         cfserver_all_time.push_back((double)*(std::max_element(temp_cfserver_end.begin(), temp_cfserver_end.end()))/(double)1000 - (double)*(std::min_element(temp_cfserver_start.begin(), temp_cfserver_start.end()))/(double)1000);
         temp_cfserver_start.clear();
