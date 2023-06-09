@@ -203,6 +203,12 @@ void PrintTime(std::vector<uint64_t> time_vec)
     std::cout << (float)time_vec[0.1*size]/1000.0 << " " << (float)time_vec[0.2*size]/1000.0 << " " << (float)time_vec[0.3*size]/1000.0 << " " << (float)time_vec[0.4*size]/1000.0 << " " << (float)time_vec[0.5*size]/1000.0 << " " << (float)time_vec[0.6*size]/1000.0 << " " << (float)time_vec[0.7*size]/1000.0 << " " << (float)time_vec[0.8*size]/1000.0 << " " << (float)time_vec[0.9*size]/1000.0 << " " << (float)(float)time_vec[0.95*size]/1000.0 << " " << (float)(float)time_vec[0.99*size]/1000.0 << " " << (float)(float)time_vec[0.999*size]/1000.0 << " ";
 }
 
+void PrintTime(std::vector<double> time_vec)
+{
+    uint64_t size = time_vec.size();
+    std::cout << (double)time_vec[0.1*size] << " " << (double)time_vec[0.2*size] << " " << (double)time_vec[0.3*size] << " " << (double)time_vec[0.4*size] << " " << (double)time_vec[0.5*size] << " " << (double)time_vec[0.6*size] << " " << (double)time_vec[0.7*size] << " " << (double)time_vec[0.8*size] << " " << (double)time_vec[0.9*size] << " " << (double)(double)time_vec[0.95*size] << " " << (double)(double)time_vec[0.99*size] << " " << (double)(double)time_vec[0.999*size] << " ";
+}
+
 float ComputeQueryCost(const GlobalStats &global_stats,
         const unsigned int util_requests,
         const unsigned int number_of_cf_servers,
