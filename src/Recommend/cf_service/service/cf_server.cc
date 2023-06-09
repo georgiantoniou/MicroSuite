@@ -284,7 +284,7 @@ int main(int argc, char** argv) {
     CreateDatasetFromFile(dataset_file_name, &dataset);
 
     cf_matrix = new CF(dataset, amf::NMFALSFactorizer(), 5, 5);    
-    cf_matrix->Init();
+    //cf_matrix->Init();
 
     ServiceImpl server;
     server.Run();
