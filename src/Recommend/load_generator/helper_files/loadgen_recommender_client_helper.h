@@ -27,6 +27,9 @@ struct TimingInfo
     uint64_t pack_recommender_resp_time = 0;
     uint64_t total_resp_time = 0;
     uint64_t recommender_time = 0;
+    //ganton12
+    std::vector<uint64_t> cfserver_start_time;
+    std::vector<uint64_t> cfserver_end_time;
 };
 
 /* This structure holds the data entered by the load generator user.*/
