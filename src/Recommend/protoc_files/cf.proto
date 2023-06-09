@@ -28,8 +28,8 @@ message TimingDataInMicro{
     uint64 bucket_time = 5;
     float cpu_util = 4;
     //TODO Ganton12
-    uint64 cfserver_start_time = 5;
-    uint64 cfserver_end_time = 6;
+    uint64 cfserver_start_time = 6;
+    uint64 cfserver_end_time = 7;
 }
 
 message UtilResponse {
