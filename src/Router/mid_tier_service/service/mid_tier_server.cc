@@ -476,7 +476,13 @@ class LookupServiceClient {
                 CHECK(false, "Exit signal received\n");
             }
             response_count_down_map[unique_request_id_value].responses_recvd = 0;
+            //response_count_down_map[unique_request_id_value].response_data.resize(replication_cnt, ResponseData());
+            //ganton12
             response_count_down_map[unique_request_id_value].response_data.resize(replication_cnt, ResponseData());
+            for (int i = 0; i < replication_cnt; i++) {
+                        response_count_down_map[unique_request_id_value].response_data[i] = ResponseData();
+            }
+            
             response_count_down_map[unique_request_id_value].router_reply->set_request_id(router_request.request_id());
             response_count_down_map[unique_request_id_value].router_reply->set_num_inline(router_parallelism);
             response_count_down_map[unique_request_id_value].router_reply->set_num_workers(dispatch_parallelism);
