@@ -65,4 +65,7 @@ message LookupResponse {
     bool kill_ack = 22;
     string value = 23;
     uint64 merge_time = 24; 
+    // TODO Ganton12 Temporary
+    repeated uint64 lookup_start_time = 25;
+    repeated uint64 lookup_end_time = 26;
 }
