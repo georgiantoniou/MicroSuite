@@ -126,6 +126,7 @@ void UpdateGlobalUtilStats(PercentUtilInfo* percent_util_info,
         GlobalStats* global_stats);
 
 void PrintTime(std::vector<uint64_t> time_vec);
+void PrintTime(std::vector<double> time_vec);
 
 float ComputeQueryCost(const GlobalStats &global_stats,
         const unsigned int util_requests,
