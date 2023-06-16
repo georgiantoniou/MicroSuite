@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <streambuf>
 #include <sstream>
+#include <numeric>
 #include "protoc_files/router.grpc.pb.h"
 
 #define CHECK(condition, error_message) if (!condition) {std::cerr << __FILE__ << ": " << __LINE__ << ": " << error_message << "\n"; exit(-1);}
@@ -26,6 +27,9 @@ struct TimingInfo
     uint64_t pack_router_resp_time = 0;
     uint64_t total_resp_time = 0;
     uint64_t router_time = 0;
+    //ganton12
+    std::vector<uint64_t> lookup_start_time;
+    std::vector<uint64_t> lookup_end_time;
 };
 
 /* This structure holds the data entered by the load generator user.*/
