@@ -99,6 +99,9 @@ void MergeAndPack(const std::vector<ResponseData> &response_data,
         unpack_lookup_srv_req_time += response_data[i].lookup_srv_timing_info->unpack_lookup_srv_req_time;
         lookup_srv_time += response_data[i].lookup_srv_timing_info->lookup_srv_time;
         pack_lookup_srv_resp_time += response_data[i].lookup_srv_timing_info->pack_lookup_srv_resp_time;
+        //ganton12
+        router_reply->add_lookup_start_time(response_data[i].lookup_srv_timing_info->lookup_start_time);
+        router_reply->add_lookup_end_time(response_data[i].lookup_srv_timing_info->lookup_end_time);
     }
     if (!nack) {
         lookup_val = "ack";
