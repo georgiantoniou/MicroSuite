@@ -1,4 +1,8 @@
 #include "loadgen_router_client_helper.h"
+struct Interval {
+    uint64_t start;
+    uint64_t end;
+};
 
 LoadGenCommandLineArgs* ParseLoadGenCommandLine(const int &argc,
         char** argv)
@@ -124,6 +128,15 @@ void UnpackTimingInfo(const router::LookupResponse &router_reply,
     timing_info->lookup_srv_time = router_reply.lookup_srv_time();
     timing_info->pack_lookup_srv_resp_time = router_reply.pack_lookup_srv_resp_time();
     timing_info->router_time = router_reply.router_time();
+    
+    //ganton12
+    for (int i = 0; i < router_reply.lookup_start_time_size(); i++)
+    {
+        timing_info->lookup_start_time.emplace_back(router_reply.lookup_start_time(i));
+        timing_info->lookup_end_time.emplace_back(router_reply.lookup_end_time(i));
+        
+    }
+        
 }
 
 void UnpackUtilInfo(const router::LookupResponse &router_reply,
@@ -232,6 +245,12 @@ void PrintTime(std::vector<uint64_t> time_vec)
     std::cout << (float)time_vec[0.1*size]/1000.0 << " " << (float)time_vec[0.2*size]/1000.0 << " " << (float)time_vec[0.3*size]/1000.0 << " " << (float)time_vec[0.4*size]/1000.0 << " " << (float)time_vec[0.5*size]/1000.0 << " " << (float)time_vec[0.6*size]/1000.0 << " " << (float)time_vec[0.7*size]/1000.0 << " " << (float)time_vec[0.8*size]/1000.0 << " " << (float)time_vec[0.9*size]/1000.0 << " " << (float)(float)time_vec[0.95*size]/1000.0 << " " << (float)(float)time_vec[0.99*size]/1000.0 << " " << (float)(float)time_vec[0.999*size]/1000.0 << " ";
 }
 
+void PrintTime(std::vector<double> time_vec)
+{
+    uint64_t size = time_vec.size();
+    std::cout << (double)time_vec[0.1*size] << " " << (double)time_vec[0.2*size] << " " << (double)time_vec[0.3*size] << " " << (double)time_vec[0.4*size] << " " << (double)time_vec[0.5*size] << " " << (double)time_vec[0.6*size] << " " << (double)time_vec[0.7*size] << " " << (double)time_vec[0.8*size] << " " << (double)time_vec[0.9*size] << " " << (double)(double)time_vec[0.95*size] << " " << (double)(double)time_vec[0.99*size] << " " << (double)(double)time_vec[0.999*size] << " ";
+}
+
 float ComputeQueryCost(const GlobalStats &global_stats,
         const unsigned int util_requests,
         const unsigned int number_of_lookup_servers,
@@ -259,8 +278,13 @@ void PrintGlobalStats(const GlobalStats &global_stats,
 {
     /*std::cout << global_stats.timing_info.create_router_req_time/responses_recvd << "," << global_stats.timing_info.update_router_util_time/responses_recvd << "," << global_stats.timing_info.unpack_loadgen_req_time/responses_recvd << "," << global_stats.timing_info.get_point_ids_time/responses_recvd << "," << global_stats.timing_info.get_bucket_responses_time/responses_recvd << "," << global_stats.timing_info.create_bucket_req_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_req_time/responses_recvd << "," << global_stats.timing_info.calculate_knn_time/responses_recvd << "," << global_stats.timing_info.pack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_bucket_resp_time/responses_recvd << "," << global_stats.timing_info.merge_time/responses_recvd << "," << global_stats.timing_info.pack_router_resp_time/responses_recvd << "," << global_stats.timing_info.unpack_router_resp_time/responses_recvd << "," << global_stats.timing_info.total_resp_time/responses_recvd << "," << global_stats.percent_util_info.router_util_percent.user_util/util_requests << "," << global_stats.percent_util_info.router_util_percent.system_util/util_requests << "," << global_stats.percent_util_info.router_util_percent.io_util/util_requests << "," << global_stats.percent_util_info.router_util_percent.idle_util/util_requests << ",";*/
 
-    std::vector<uint64_t> total_response_time, create_router_req, update_router_util, unpack_router_req, get_lookup_srv_responses, create_lookup_srv_req, unpack_lookup_srv_req, lookup_srv_time, pack_lookup_srv_resp, unpack_lookup_srv_resp, merge, pack_router_resp, unpack_router_resp, router_time;
+    std::vector<uint64_t> total_response_time, create_router_req, update_router_util, unpack_router_req, get_lookup_srv_responses, create_lookup_srv_req, unpack_lookup_srv_req, lookup_srv_time, pack_lookup_srv_resp, unpack_lookup_srv_resp, merge, pack_router_resp, unpack_router_resp, router_time, lookup_proc_time, lookup_idle_time;
+    std::vector<double> lookup_all_time;
     unsigned int timing_info_size = global_stats.timing_info.size();
+    std::vector<uint64_t> temp_lookup_start;
+    std::vector<uint64_t> temp_lookup_end;
+    std::vector<Interval> intervals(global_stats.timing_info[i].lookup_start_time.size());
+        
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
         total_response_time.push_back(global_stats.timing_info[i].total_resp_time);
@@ -276,6 +300,35 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         pack_router_resp.push_back(global_stats.timing_info[i].pack_router_resp_time);
         unpack_router_resp.push_back(global_stats.timing_info[i].unpack_router_resp_time);
         router_time.push_back(global_stats.timing_info[i].router_time);
+        for (int j = 0; j < global_stats.timing_info[i].lookup_start_time.size(); j++) {
+                intervals[j].start = global_stats.timing_info[i].lookup_start_time[j];
+                intervals[j].end = global_stats.timing_info[i].lookup_end_time[j];
+                temp_lookup_start.push_back(global_stats.timing_info[i].lookup_start_time[j]);
+                temp_lookup_end.push_back(global_stats.timing_info[i].lookup_end_time[j]);
+        }
+            
+        sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
+        return a.start < b.start;
+        });
+        
+        uint64_t idle_time = 0;
+        uint64_t end_time = intervals[0].end;
+        for (int j = 1; j < global_stats.timing_info[i].lookup_start_time.size(); j++) {
+                if (intervals[j].start >= end_time) {
+                        // no overlap, add idle time
+                        idle_time += intervals[j].start - end_time;
+                        end_time = intervals[j].end;
+                } else {
+                        // overlap, update end time
+                        end_time = std::max(end_time, intervals[j].end);
+                }
+        }
+        
+        lookup_proc_time.push_back(intervals[global_stats.timing_info[i].lookup_start_time.size()-1].end - intervals[0].start - idle_time);
+        lookup_idle_time.push_back(idle_time);
+        lookup_all_time.push_back((double)*(std::max_element(temp_lookup_end.begin(), temp_lookup_end.end()))/(double)1000 - (double)*(std::min_element(temp_lookup_start.begin(), temp_lookup_start.end()))/(double)1000);
+        temp_lookup_start.clear();
+        temp_lookup_end.clear();
     }
     std::sort(total_response_time.begin(), total_response_time.end());
     std::sort(create_router_req.begin(), create_router_req.end());
@@ -290,6 +343,10 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::sort(pack_router_resp.begin(), pack_router_resp.end());
     std::sort(unpack_router_resp.begin(), unpack_router_resp.end());
     std::sort(router_time.begin(), router_time.end());
+    std::sort(lookup_proc_time.begin(), lookup_proc_time.end());
+    std::sort(lookup_idle_time.begin(), lookup_idle_time.end());
+    std::sort(lookup_all_time.begin(), lookup_all_time.end()); 
+        
     std::cout << "\n Total response time \n"; 
     PrintTime(total_response_time);
     std::cout << std::endl;
@@ -299,25 +356,65 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     PrintTime(update_router_util);
     std::cout << "\n Unpack loadgen request time ";
     PrintTime(unpack_router_req);
+ 
     std::cout << "\n Total time taken by router server: \n";
     PrintTime(router_time);
+    uint64_t router_size = router_time.size();
+    std::cout << "Average Router Time(ms): " << (double)std::accumulate(router_time.begin(), router_time.end(), (unsigned long long) 0)/(double)router_size/(double)1000 << " \n";
+  
     //std::cout << std::endl;
     std::cout << "\n Get bucket responses time \n";
     PrintTime(get_lookup_srv_responses);
+    uint64_t lookup_size = get_lookup_srv_responses.size();
+    std::cout << "Average Lookup Response Time(ms): " << (double)std::accumulate(get_lookup_srv_responses.begin(), get_lookup_srv_responses.end(), (unsigned long long) 0)/(double)lookup_size/(double)1000 << " \n";
+    
     std::cout << "\n Create bucket request time ";
     PrintTime(create_lookup_srv_req);
+    uint64_t create_lookup_srv_req_size = create_lookup_srv_req.size();
+    std::cout << "Average Create Lookup Request Response Time(ms): " << (double)std::accumulate(create_lookup_srv_req.begin(), create_lookup_srv_req.end(), (unsigned long long) 0)/(double)create_lookup_srv_req_size/(double)1000 << " \n";
+      
     std::cout << "\n Unpack bucket request time ";
     PrintTime(unpack_lookup_srv_req);
+    uint64_t unpack_lookup_srv_req_size = unpack_lookup_srv_req.size();
+    std::cout << "Average Unpack Lookup Request Response Time(ms): " << (double)std::accumulate(unpack_lookup_srv_req.begin(), unpack_lookup_srv_req.end(), (unsigned long long) 0)/(double)unpack_lookup_srv_req_size/(double)1000 << " \n";
+     
     std::cout << "\n Calculate knn time \n";
     PrintTime(lookup_srv_time);
+    uint64_t lookup_srv_time_size = lookup_srv_time.size();
+    std::cout << "Average Calculate KNN Response Time(ms): " << (double)std::accumulate(lookup_srv_time.begin(), lookup_srv_time.end(), (unsigned long long) 0)/(double)lookup_srv_time_size/(double)1000 << " \n";
+     
     std::cout << "\n Pack bucket response time ";
     PrintTime(pack_lookup_srv_resp);
+    uint64_t pack_lookup_srv_resp_size = pack_lookup_srv_resp.size();
+    std::cout << "Average Pack Bucket Response Time(ms): " << (double)std::accumulate(pack_lookup_srv_resp.begin(), pack_lookup_srv_resp.end(), (unsigned long long) 0)/(double)pack_lookup_srv_resp_size/(double)1000 << " \n";
+     
     std::cout << "\n Unpack bucket response time ";
     PrintTime(unpack_lookup_srv_resp);
+    uint64_t unpack_lookup_srv_resp_size = unpack_lookup_srv_resp.size();
+    std::cout << "Average Unpack Lookup Response Time(ms): " << (double)std::accumulate(unpack_lookup_srv_resp.begin(), unpack_lookup_srv_resp.end(), (unsigned long long) 0)/(double)unpack_lookup_srv_resp_size/(double)1000 << " \n";
+     
     std::cout << "\n Pack router response time ";
     PrintTime(pack_router_resp);
+    uint64_t pack_router_resp_size = pack_router_resp.size();
+    std::cout << "Average Pack Router Response Time(ms): " << (double)std::accumulate(pack_router_resp.begin(), pack_router_resp.end(), (unsigned long long) 0)/(double)pack_router_resp_size/(double)1000 << " \n";
+     
     std::cout << "\n Unpack router response time ";
     PrintTime(unpack_router_resp);
+    uint64_t unpack_router_resp_size = unpack_router_resp.size();
+    std::cout << "Average Unpack Router Response Time(ms): " << (double)std::accumulate(unpack_router_resp.begin(), unpack_router_resp.end(), (unsigned long long) 0)/(double)unpack_router_resp_size/(double)1000 << " \n";
+    
+    uint64_t lookup_proc_time_size = lookup_proc_time.size();
+    std::cout << "\nLookup Server Proc Time(ms): " << (double)std::accumulate(lookup_proc_time.begin(), lookup_proc_time.end(), (unsigned long long) 0)/(double)lookup_proc_time_size/(double)1000 << " \n"; 
+    PrintTime(lookup_proc_time); 
+    
+    uint64_t lookup_idle_time_size = lookup_idle_time.size();
+    std::cout << "\nLookup Server Idle Time(ms): " << (double)std::accumulate(lookup_idle_time.begin(), lookup_idle_time.end(), (unsigned long long) 0)/(double)lookup_idle_time_size/(double)1000 << " \n"; 
+    PrintTime(lookup_idle_time); 
+    
+    uint64_t lookup_all_time_size = lookup_all_time.size();
+    std::cout << "\nLookup Server All Time(ms): " << (double)std::accumulate(lookup_all_time.begin(), lookup_all_time.end(), (double)  0.0)/(double)lookup_all_time_size << " \n"; 
+    PrintTime(lookup_all_time);
+        
     /*for(int i = 0; i < number_of_bucket_servers; i++)
       {
       std::cout << global_stats.percent_util_info.bucket_util_percent[i].user_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].system_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].io_util/util_requests << "," << global_stats.percent_util_info.bucket_util_percent[i].idle_util/util_requests << ",";
