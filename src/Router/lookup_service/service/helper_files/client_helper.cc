@@ -34,6 +34,9 @@ void UnpackTimingInfo(const Value &reply,
     lookup_srv_timing_info->lookup_srv_time = reply.timing_data_in_micro().lookup_srv_time_in_micro();
     lookup_srv_timing_info->pack_lookup_srv_resp_time = reply.timing_data_in_micro().pack_lookup_srv_resp_time_in_micro();
     lookup_srv_timing_info->cpu_util_lookup_srv = reply.timing_data_in_micro().cpu_util();
+    //ganton12
+    lookup_srv_timing_info->lookup_start_time = reply.timing_data_in_micro().lookup_start_time();
+    lookup_srv_timing_info->lookup_end_time = reply.timing_data_in_micro().lookup_end_time();
 }
 
 void UnpackUtilInfo(const Value &reply,
