@@ -10,6 +10,9 @@ struct LookupSrvTimingInfo {
     uint64_t pack_lookup_srv_resp_time = 0;
     uint64_t unpack_lookup_srv_resp_time = 0;
     float cpu_util_lookup_srv = 0.0;
+    //ganton12
+    uint64_t lookup_start_time = 0;
+    uint64_t lookup_end_time = 0;
 };
 
 struct LookupSrvUtil {
