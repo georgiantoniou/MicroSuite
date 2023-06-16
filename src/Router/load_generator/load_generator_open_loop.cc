@@ -188,6 +188,9 @@ class RouterServiceClient {
                     char* cmd = new char[s.length() + 1];
                     std::strcpy(cmd, s.c_str());
                     ExecuteShellCommand(cmd);
+                    std::cout << "Call Status Error Code: " << call->status.error_code() << "\n";
+                    std::cout << "Call Status Error Message: " << call->status.error_message() << "\n";
+                    std::cout << "Call Status Error Details: " << call->status.error_details() << "\n";
                     std::cout << "Load generator failed\n";
                     CHECK(false, "");
                 }
@@ -252,10 +255,75 @@ class RouterServiceClient {
 
             // Spawn reader thread that loops indefinitely
             std::thread thread_ = std::thread(&RouterServiceClient::AsyncCompleteRpc, &router_client);
-            uint64_t query_id = rand() % queries.size();
+            
+            // Resize Queries to 1000000 to match Memcached Initialization
+            queries.erase(queries.begin() + 1000000, queries.end());
+           
+            uint64_t query_id = 0;
             std::string key = std::get<0>(queries[query_id]);
             std::string value = std::get<1>(queries[query_id]);
-            int operation = 1;
+            int operation = 2;
+          
+            double center = 1000000.0/(double)(5000);
+            double curr_time = (double)GetTimeInMicro();
+            double exit_time = curr_time + (double)(200*1000000.0);
+
+            std::default_random_engine generator;
+            std::poisson_distribution<int> distributionwarmup(center);
+            double next_time = distributionwarmup(generator) + curr_time;
+            
+             //ganton12
+            //initialize memcached with 1000000 records
+            uint64_t overall_queries = 1000000;
+            while (responses_recvd->AtomicallyReadCount() < overall_queries) 
+            {
+              if (curr_time >= next_time && num_requests->AtomicallyReadCount() < overall_queries) {
+                num_requests->AtomicallyIncrementCount();
+                if((num_requests->AtomicallyReadCount() == 1) || ((GetTimeInSec() - interval_start_time) >= 10)){
+                    util_requests->AtomicallyIncrementCount();
+                    router_client.Router(key,
+                            value,
+                            operation,
+                            true,
+                            false);
+                    interval_start_time = GetTimeInSec();
+                } else {
+                    router_client.Router(key,
+                            value,                       
+                            operation,                                               
+                            false,
+                            false);  
+                }
+                next_time = distributionwarmup(generator) + curr_time;
+                query_id = query_id + 1;
+                key = std::get<0>(queries[query_id]);
+                value = std::get<1>(queries[query_id]);
+                
+              }
+                curr_time = (double)GetTimeInMicro();
+            }
+          
+            // Reset Timing Statistics
+            global_stats_mutex.lock();
+            ResetMetaStats(global_stats,number_of_lookup_servers);
+            global_stats_mutex.unlock();
+          
+            //Reset requests counters
+            num_requests->AtomicallyResetCount();
+            responses_recvd->AtomicallyResetCount();
+          
+            //Print counters to validate
+            float achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
+            std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
+            std::cout << "!!!!!!!End of Warmup Period!!!!!!!" << " \n";
+          
+          
+            query_id = rand() % queries.size();
+            key = std::get<0>(queries[query_id]);
+            value = std::get<1>(queries[query_id]);
+          
+            operation = 1;
             if (get_ratio >= set_ratio) {
                 get_cnt = (get_cnt + 1) % (get_ratio + 1);
             }
@@ -263,18 +331,18 @@ class RouterServiceClient {
                 operation = 2;
                 set_cnt = (set_cnt + 1) % (set_ratio + 1);
             }
-
-            double center = 1000000.0/(double)(qps);
-            double curr_time = (double)GetTimeInMicro();
-            double exit_time = curr_time + (double)(time_duration*1000000.0);
-
-            std::default_random_engine generator;
+            center = 1000000.0/(double)(qps);
+            curr_time = (double)GetTimeInMicro();
+            std::default_random_engine generator_run;
             std::poisson_distribution<int> distribution(center);
-            double next_time = distribution(generator) + curr_time;
-
-            while (curr_time < exit_time) 
+            next_time = distribution(generator_run) + curr_time;
+            overall_queries = qps*time_duration;
+            //ganton12
+            //actual run
+            double start_time_actual_run = (double)GetTimeInMicro();
+            while (responses_recvd->AtomicallyReadCount() < overall_queries) 
             {
-                if (curr_time >= next_time) {
+                if (curr_time >= next_time && num_requests->AtomicallyReadCount() < overall_queries) {
                     num_requests->AtomicallyIncrementCount();
                     if((num_requests->AtomicallyReadCount() == 1) || ((GetTimeInSec() - interval_start_time) >= 10)){
                         util_requests->AtomicallyIncrementCount();
@@ -291,7 +359,7 @@ class RouterServiceClient {
                                 false,
                                 false);  
                     }
-                    next_time = distribution(generator) + curr_time;
+                    next_time = distribution(generator_run) + curr_time;
                     query_id = rand() % queries.size();
                     key = std::get<0>(queries[query_id]);
                     value = std::get<1>(queries[query_id]);
@@ -326,18 +394,31 @@ class RouterServiceClient {
                             CHECK(false, "Set count cannot exceed set ratio\n");
                         }
                     }
-
                 }
+               
                 curr_time = (double)GetTimeInMicro();
             }
 
-            float achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
-
+            achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            std::cout << "Target QPS: " << achieved_qps << "\n" ;
+          
+            achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)(((double)GetTimeInMicro() - start_time_actual_run)/1000000);
+            std::cout << "Actual QPS: " << achieved_qps << "\n";
+          
+            std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
+            std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
+            
             global_stats_mutex.lock();
             PrintLatency(*global_stats,
                     number_of_lookup_servers,
                     (util_requests->AtomicallyReadCount() - 1),
                     responses_recvd->AtomicallyReadCount());
+          
+            PrintGlobalStats(*global_stats,
+                     number_of_lookup_servers,
+                    (util_requests->AtomicallyReadCount()-1),
+                    responses_recvd->AtomicallyReadCount());
+            std::cout.flush();
 
             float query_cost = ComputeQueryCost(*global_stats, 
                     (util_requests->AtomicallyReadCount() - 1),
