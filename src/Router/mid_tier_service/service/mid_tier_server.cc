@@ -538,7 +538,8 @@ class LookupServiceClient {
             //map_fine_mutex[unique_request_id_value]->unlock();
 
             int lookup_srv_to_send_req_to = 0;
-            int replication_count = 1;
+            //int replication_count = 1;
+            int replication_count = replication_cnt;
             if (request_to_lookup_srv.operation() == 2) {
                 replication_count = replication_cnt;
             }
