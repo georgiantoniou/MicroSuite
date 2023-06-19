@@ -283,7 +283,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     unsigned int timing_info_size = global_stats.timing_info.size();
     std::vector<uint64_t> temp_lookup_start;
     std::vector<uint64_t> temp_lookup_end;
-    std::vector<Interval> intervals(global_stats.timing_info[i].lookup_start_time.size());
+    std::vector<Interval> intervals(global_stats.timing_info[0].lookup_start_time.size());
         
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
