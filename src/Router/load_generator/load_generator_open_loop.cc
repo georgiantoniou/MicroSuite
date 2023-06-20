@@ -317,7 +317,7 @@ class RouterServiceClient {
             std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
             std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
             std::cout << "!!!!!!!End of Warmup Period!!!!!!!" << " \n";
-            sleep(5);
+            sleep(10);
           
             query_id = rand() % queries.size();
             key = std::get<0>(queries[query_id]);
