@@ -284,7 +284,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
     std::vector<uint64_t> temp_lookup_start;
     std::vector<uint64_t> temp_lookup_end;
     std::vector<Interval> intervals(global_stats.timing_info[0].lookup_start_time.size());
-    std::cout << "Interval Size" << intervals.size() << "\n";
+    
         
     for(unsigned int i = 0; i < timing_info_size; i++)
     {
@@ -438,6 +438,10 @@ void PrintLatency(const GlobalStats &global_stats,
     //uint64_t size = total_response_time.size();
     //std::cout << (float)total_response_time[0.5*size]/1000.0 << " " << (float)total_response_time[0.99*size]/1000.0 << " ";
     PrintTime(total_response_time);
+    uint64_t total_response_time_size = total_response_time.size();
+    std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), (unsigned long long) 0)/(double)total_response_time_size/(double)1000 << " \n";
+}
+
 }
 
 void PrintUtil(const GlobalStats &global_stats,
