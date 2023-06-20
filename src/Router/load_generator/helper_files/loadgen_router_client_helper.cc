@@ -441,9 +441,6 @@ void PrintLatency(const GlobalStats &global_stats,
     uint64_t total_response_time_size = total_response_time.size();
     std::cout << "Average Response Time(ms): " << (double)std::accumulate(total_response_time.begin(), total_response_time.end(), (unsigned long long) 0)/(double)total_response_time_size/(double)1000 << " \n";
 }
-
-}
-
 void PrintUtil(const GlobalStats &global_stats,
         const unsigned int number_of_lookup_servers,
         const unsigned int util_requests)
