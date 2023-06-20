@@ -339,7 +339,7 @@ class RouterServiceClient {
             overall_queries = qps*time_duration;
             //ganton12
             //actual run
-            
+            std::cout << "Start Time: " << (double)GetTimeInMicro() << "\n" ;
             double start_time_actual_run = (double)GetTimeInMicro();
             while (responses_recvd->AtomicallyReadCount() < overall_queries) 
             {
@@ -399,7 +399,7 @@ class RouterServiceClient {
                
                 curr_time = (double)GetTimeInMicro();
             }
-
+            std::cout << "Start Time: " << (double)GetTimeInMicro() << "\n" ;
             std::cout << "!!! End of Actual Run !!!" << "\n" ;
             achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
             std::cout << "Target QPS: " << achieved_qps << "\n" ;
