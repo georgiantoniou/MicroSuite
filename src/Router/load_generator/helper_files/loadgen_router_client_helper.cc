@@ -325,7 +325,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
                 }
         }
         
-        lookup_proc_time.push_back((double)*(std::max_element(temp_lookup_end.begin(), temp_lookup_end.end()))/(double)1000 - (double)*(std::min_element(temp_lookup_start.begin(), temp_lookup_start.end()))/(double)1000 - idle_time);
+        lookup_proc_time.push_back((double)*(std::max_element(temp_lookup_end.begin(), temp_lookup_end.end())) - (double)*(std::min_element(temp_lookup_start.begin(), temp_lookup_start.end())) - idle_time);
         lookup_idle_time.push_back(idle_time);
         lookup_all_time.push_back((double)*(std::max_element(temp_lookup_end.begin(), temp_lookup_end.end()))/(double)1000 - (double)*(std::min_element(temp_lookup_start.begin(), temp_lookup_start.end()))/(double)1000);
         temp_lookup_start.clear();
