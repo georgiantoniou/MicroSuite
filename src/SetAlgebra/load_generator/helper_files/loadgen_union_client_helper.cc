@@ -281,8 +281,8 @@ void PrintGlobalStats(const GlobalStats &global_stats,
                         end_time = std::max(end_time, intervals[j].end);
                 }
         }
-        
-        intersection_proc_time.push_back(intervals[number_of_intersection_servers-1].end - intervals[0].start - idle_time);
+
+        intersection_proc_time.push_back((double)*(std::max_element(temp_intersection_end.begin(), temp_intersection_end.end())) - (double)*(std::min_element(temp_intersection_start.begin(), temp_intersection_start.end())) - idle_time);
         intersection_idle_time.push_back(idle_time);
         intersection_all_time.push_back((double)*(std::max_element(temp_intersection_end.begin(), temp_intersection_end.end()))/(double)1000 - (double)*(std::min_element(temp_intersection_start.begin(), temp_intersection_start.end()))/(double)1000);
         temp_intersection_start.clear();
