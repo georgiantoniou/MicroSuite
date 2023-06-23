@@ -259,9 +259,10 @@ void PrintGlobalStats(const GlobalStats &global_stats,
         union_time.push_back(global_stats.timing_info[i].union_time);
         for (int j = 0; j < number_of_intersection_servers; j++) {
                 intervals[j].start = global_stats.timing_info[i].intersection_start_time[j];
-                intervals[j].end = global_stats.timing_info[i].intersection_end_time[j];
+                intervals[j].end = global_stats.timing_info[i].intersection_start_time[j]
                 temp_intersection_start.push_back(global_stats.timing_info[i].intersection_start_time[j]);
                 temp_intersection_end.push_back(global_stats.timing_info[i].intersection_end_time[j]);
+                std::cout << "Query ID: " << i << " Start: " <<  global_stats.timing_info[i].intersection_start_time[j] << " End " << global_stats.timing_info[i].intersection_start_time[j] << "\n";
         }
             
         sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
