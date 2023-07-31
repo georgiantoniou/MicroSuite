@@ -306,6 +306,7 @@ void PrintGlobalStats(const GlobalStats &global_stats,
                 intervals[j].end = global_stats.timing_info[i].lookup_end_time[j];
                 temp_lookup_start.push_back(global_stats.timing_info[i].lookup_start_time[j]);
                 temp_lookup_end.push_back(global_stats.timing_info[i].lookup_end_time[j]);
+                std::cout << "Query ID: " << i << " Start: " <<  global_stats.timing_info[i].lookup_start_time[j] << " End " << global_stats.timing_info[i].lookup_end_time[j] << "\n";
         }
             
         sort(intervals.begin(), intervals.end(), [](const Interval& a, const Interval& b) {
