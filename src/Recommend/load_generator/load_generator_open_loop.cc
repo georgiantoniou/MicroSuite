@@ -253,14 +253,14 @@ class RecommenderServiceClient {
             uint64_t query_id = rand() % queries_size;
             std::pair<int, int> query = queries[query_id];
 
-             double center = 1000000.0/(double)(qps);
+            double center = 1000000.0/(double)(1000);
             double curr_time = (double)GetTimeInMicro();
             double exit_time = curr_time + (double)(15*1000000.0);
             uint64_t overall_queries = 1000 * 15;
 
             std::default_random_engine generator;
-            std::poisson_distribution<int> distribution(center);
-            double next_time = distribution(generator) + curr_time;
+            std::poisson_distribution<int> distributionwarmup(center);
+            double next_time = distributionwarmup(generator) + curr_time;
 
           
           //!!!!!!!WarmUp Phase!!!!!!
@@ -281,7 +281,7 @@ class RecommenderServiceClient {
                                 false,
                                 false);  
                     }
-                    next_time = distribution(generator) + curr_time;
+                    next_time = distributionwarmup(generator) + curr_time;
                     query_id = rand() % queries_size;
                     query = queries[query_id];
                 }
@@ -302,14 +302,21 @@ class RecommenderServiceClient {
             std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
             std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
             std::cout << "!!!!!!!End of Warmup Period!!!!!!!" << " \n";
-          
+            sleep(10);
+
+            center = 1000000.0/(double)(qps);
             curr_time = (double)GetTimeInMicro();
+            std::default_random_engine generator_run;
+            std::poisson_distribution<int> distribution(center);
+            next_time = distribution(generator_run) + curr_time;
             exit_time = curr_time + (double)(time_duration*1000000.0);
             overall_queries = qps * time_duration;
-            next_time = distribution(generator) + curr_time;
+           
             query_id = rand() % queries_size;
             query = queries[query_id];
-         
+
+            std::cout << "Start Time: " << GetTimeInMicro() << "\n" ;
+            double start_time_actual_run = (double)GetTimeInMicro();
             while (responses_recvd->AtomicallyReadCount() < overall_queries) 
             {
                 if (curr_time >= next_time && num_requests->AtomicallyReadCount() < overall_queries) {
@@ -325,14 +332,22 @@ class RecommenderServiceClient {
                                 false,
                                 false);  
                     }
-                    next_time = distribution(generator) + curr_time;
+                    next_time = distribution(generator_run) + curr_time;
                     query_id = rand() % queries_size;
                     query = queries[query_id];
                 }
                 curr_time = (double)GetTimeInMicro();
             }
           
+            std::cout << "Start Time: " << GetTimeInMicro() << "\n" ;
+            std::cout << "!!! End of Actual Run !!!" << "\n" ;
+           
             achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)time_duration;
+            std::cout << "Target QPS: " << achieved_qps << "\n" ;
+          
+            achieved_qps = (float)responses_recvd->AtomicallyReadCount()/(float)(((double)GetTimeInMicro() - start_time_actual_run)/1000000);
+            std::cout << "Actual QPS: " << achieved_qps << "\n";
+           
             std::cout << "Requests: " << num_requests->AtomicallyReadCount() << "\n" ;
             std::cout << "Responses: " << responses_recvd->AtomicallyReadCount() << "\n";
 
@@ -352,7 +367,7 @@ class RecommenderServiceClient {
                     responses_recvd->AtomicallyReadCount());
             std::cout.flush();
             global_stats_mutex.unlock();
-           
+
             std::cout << query_cost << " ";
             std::cout << std::endl;
 
